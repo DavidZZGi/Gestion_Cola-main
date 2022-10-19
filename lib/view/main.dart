@@ -12,6 +12,7 @@ import './upscreen_part.dart';
 import './tapbar.dart';
 import 'lineform.dart';
 import 'loggin.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -24,6 +25,16 @@ void main() {
       ChangeNotifierProvider(create: (context) => LineProvider())
     ],
     child: MaterialApp(
+      supportedLocales: [
+        Locale('de'),
+        Locale('en'),
+        Locale('es'),
+        Locale('fr'),
+        Locale('it'),
+      ],
+      localizationsDelegates: [
+        FormBuilderLocalizations.delegate,
+      ],
       initialRoute: '/loading',
       routes: {
         '/loading': (context) => LoadingPage(),
@@ -57,8 +68,8 @@ print(path);
 
 //Provider.of<ClienteProvider>(context,listen: false).inicializarClientesSinConexion();
 
-Provider.of<ShopProvider>(context,listen: false).initShopList(Provider.of<ConnectionProvider>(context,listen: false).getAllShops());
-
+    Provider.of<ShopProvider>(context, listen: false).initShopList(
+        Provider.of<ConnectionProvider>(context, listen: false).getAllShops());
   }
 
   @override
@@ -68,8 +79,9 @@ Provider.of<ShopProvider>(context,listen: false).initShopList(Provider.of<Connec
           title: Center(
             child: Text(
               'Sistema de Gestión de Colas',
-              style:
-                  TextStyle(fontWeight: FontWeight.bold, color: Color.fromARGB(228, 255, 255, 255)),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(228, 255, 255, 255)),
             ),
           ),
           automaticallyImplyLeading: false,

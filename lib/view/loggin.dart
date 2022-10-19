@@ -1,20 +1,22 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: unrelated_type_equality_checks
 
+import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 class SignUpScreen extends StatelessWidget {
   const SignUpScreen();
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration:BoxDecoration(
-               gradient:  LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [Colors.lightBlue, Color.fromRGBO(14, 30, 50, 1.7)]),
-    
-            ), 
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Colors.lightBlue, Color.fromRGBO(14, 30, 50, 1.7)]),
+        ),
         child: const Center(
           child: SizedBox(
             width: 400,
@@ -30,7 +32,7 @@ class SignUpScreen extends StatelessWidget {
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm();
-  
+
   @override
   _SignUpFormState createState() => _SignUpFormState();
 }
@@ -39,9 +41,12 @@ class _SignUpFormState extends State<SignUpForm> {
   final _completeNameTextController = TextEditingController();
   final _phonetextController = TextEditingController();
   final _ciTextController = TextEditingController();
+  String? phoneTextVal;
+  String? ciTextVal;
 
   double _formProgress = 0;
 
+  final formKey = GlobalKey<FormBuilderState>();
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -50,51 +55,65 @@ class _SignUpFormState extends State<SignUpForm> {
         mainAxisSize: MainAxisSize.min,
         children: [
           AnimatedProgressIndicator(value: _formProgress),
-          Text('Autentificación', style: Theme
-              .of(context)
-              .textTheme
-              .headline4),
+          Text('Autenticación', style: Theme.of(context).textTheme.headline4),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _completeNameTextController,
-              decoration: const InputDecoration(labelText: 'Nombre y Apellidos'),
+              decoration:
+                  const InputDecoration(labelText: 'Nombre y Apellidos'),
+              validator: FormBuilderValidators.required(),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: _phonetextController,
-              decoration: const InputDecoration(labelText: 'Número de Teléfono'),
+              decoration:
+                  const InputDecoration(labelText: 'Número de Teléfono'),
+              autovalidateMode: AutovalidateMode.always,
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.numeric(),
+                FormBuilderValidators.minLength(11),
+              ]),
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
-              
               controller: _ciTextController,
-              decoration: const InputDecoration(labelText: 'Carnet de Identidad'),
+              decoration:
+                  const InputDecoration(labelText: 'Carnet de Identidad'),
+              autovalidateMode: AutovalidateMode.always,
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.numeric(),
+                FormBuilderValidators.minLength(11),
+              ]),
             ),
           ),
           TextButton(
             style: ButtonStyle(
-              foregroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
-                return states.contains(MaterialState.disabled) ? null : Colors.white;
+              foregroundColor: MaterialStateProperty.resolveWith(
+                  (Set<MaterialState> states) {
+                return states.contains(MaterialState.disabled)
+                    ? null
+                    : Colors.white;
               }),
-              backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
-                return states.contains(MaterialState.disabled) ? null : Colors.blue;
+              backgroundColor: MaterialStateProperty.resolveWith(
+                  (Set<MaterialState> states) {
+                return states.contains(MaterialState.disabled)
+                    ? null
+                    : Colors.blue;
               }),
             ),
-            onPressed: _formProgress==1 ? _showelcomescreen :null,
+            onPressed: _formProgress == 1 ? _showelcomescreen : null,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: const Text('Acceder',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                
-              ),
-              
-              
+              child: const Text(
+                'Acceder',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -104,30 +123,28 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   void _showelcomescreen() {
-     Navigator.of(context).pushNamed('/cubacola');
+    Navigator.of(context).pushNamed('/cubacola');
   }
-void _updateformprogress(){
-  var progress = 0.0;
-  final controllers = [
-    _completeNameTextController,
-    _phonetextController,
-    _ciTextController
-  ];
 
-  for (final controller in controllers) {
-    if (controller.value.text.isNotEmpty ) {
-      progress += 1 / controllers.length;
+  void _updateformprogress() {
+    var progress = 0.0;
+    final controllers = [
+      _completeNameTextController,
+      _phonetextController,
+      _ciTextController
+    ];
+
+    for (final controller in controllers) {
+      if (controller.value.text.isNotEmpty) {
+        progress += 1 / controllers.length;
+      }
     }
+
+    setState(() {
+      _formProgress = progress;
+    });
   }
-
-  setState(() {
-    _formProgress = progress;
-  });
 }
-}
-
-
-
 
 class AnimatedProgressIndicator extends StatefulWidget {
   final double value;
@@ -152,7 +169,6 @@ class _AnimatedProgressIndicatorState extends State<AnimatedProgressIndicator>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      
         duration: Duration(milliseconds: 1200), vsync: this);
 
     final colorTween = TweenSequence([

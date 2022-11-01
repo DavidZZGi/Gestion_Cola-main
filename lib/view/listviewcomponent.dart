@@ -26,20 +26,18 @@ class _MylistViewState extends State<MylistView> {
   @override
   void initState() {
     super.initState();
-   Provider.of<ConnectionProvider>(context, listen: false)
+    Provider.of<ConnectionProvider>(context, listen: false)
         .loadClientesFromDB();
   }
 
   @override
   Widget build(BuildContext context) {
-    clientes =
-        Provider.of<ConnectionProvider>(context).clientesDB;
-       clientesAdds=Provider.of<ClienteProvider>(context).listacliente;
+    clientes = Provider.of<ConnectionProvider>(context).clientesDB;
+    /*clientesAdds=Provider.of<ClienteProvider>(context).listacliente;
     for (var element in clientesAdds) {
       if (!clientes.contains(element)) clientes.add(element);
-    }
+  */
 
- 
     return ListView.builder(
         padding: EdgeInsets.all(6),
         itemCount: clientes.length,
@@ -57,7 +55,7 @@ class _MylistViewState extends State<MylistView> {
             key: ValueKey<String>(cliente.nombre),
             onDismissed: (DismissDirection direction) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                duration: Duration(seconds: 2),
+                  duration: Duration(seconds: 2),
                   content:
                       Text('${clientes[i].nombre} fue removido de la cola')));
               setState(() {

@@ -71,10 +71,12 @@ class _SignUpFormState extends State<SignUpForm> {
               controller: _phonetextController,
               decoration:
                   const InputDecoration(labelText: 'Número de Teléfono'),
-              autovalidateMode: AutovalidateMode.always,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.numeric(),
-                FormBuilderValidators.minLength(11),
+                FormBuilderValidators.minLength(8,
+                    errorText:
+                        'El numero de telefono tiene que tener 8 cifras'),
               ]),
             ),
           ),
@@ -84,10 +86,12 @@ class _SignUpFormState extends State<SignUpForm> {
               controller: _ciTextController,
               decoration:
                   const InputDecoration(labelText: 'Carnet de Identidad'),
-              autovalidateMode: AutovalidateMode.always,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.numeric(),
-                FormBuilderValidators.minLength(11),
+                FormBuilderValidators.minLength(11,
+                    errorText:
+                        'El Carnet de Identidad tiene que tener 11 cifras'),
               ]),
             ),
           ),

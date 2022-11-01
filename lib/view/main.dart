@@ -76,14 +76,21 @@ print(path);
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Center(
-            child: Text(
-              'Sistema de Gestión de Colas',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(228, 255, 255, 255)),
+          title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Image.asset(
+              'images/C-Cuba-removebg-preview.png',
+              width: 120,
+              height: 150,
             ),
-          ),
+            Text(
+              'Sistema Gestión de Cola',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(228, 255, 255, 255),
+                fontSize: 18.0,
+              ),
+            ),
+          ]),
           automaticallyImplyLeading: false,
         ),
         body: Column(

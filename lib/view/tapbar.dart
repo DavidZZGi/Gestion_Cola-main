@@ -8,8 +8,6 @@ import 'package:line_management/provider/munprovider.dart';
 import 'package:line_management/provider/productProvider.dart';
 import 'package:line_management/provider/shopProvider.dart';
 import 'package:line_management/view/shopDropdown.dart';
-
-import 'package:line_management/view/tiendadropdown.dart';
 import 'package:provider/provider.dart';
 import '../model/shop.dart';
 import '../provider/connectionProvider.dart';
@@ -26,8 +24,8 @@ class MyTapBar extends StatefulWidget {
 class _MyTapBarState extends State<MyTapBar> {
   bool munSelected = false;
   bool tiendaSelected = false;
-  late Future<List<Municipio>>municipios;
-  late Future<List<Shop>>shops;
+  late Future<List<Municipio>> municipios;
+  late Future<List<Shop>> shops;
   //late Future<List> shops;
   @override
   Widget build(BuildContext context) {
@@ -37,8 +35,8 @@ class _MyTapBarState extends State<MyTapBar> {
       child: Scaffold(
         appBar: AppBar(
           elevation: 0.0,
-          backgroundColor: Colors.blueGrey,
-          shadowColor: Colors.grey,
+          backgroundColor: Color.fromARGB(185, 58, 112, 128),
+          //shadowColor: Colors.grey,
           title: Center(
             child: Text(''),
           ),
@@ -90,9 +88,8 @@ class _MyTapBarState extends State<MyTapBar> {
                     height: 10,
                   ),
                   //UnconstrainedBox(child: Flexible(child: shopsListView())),
-                 //containerGradiente(TiendaDropdown(), 'Seleccionar tienda'),
-                 containerGradiente( ShopDropdown(), 'Seleccionar tienda')
-                ,
+                  //containerGradiente(TiendaDropdown(), 'Seleccionar tienda'),
+                  containerGradiente(ShopDropdown(), 'Seleccionar tienda'),
                   SizedBox(
                     height: 10,
                   ),
@@ -134,7 +131,7 @@ class _MyTapBarState extends State<MyTapBar> {
                         },
                         child: Text('Crear Cola')),
                   ),
-                  Padding(
+                  /*  Padding(
                     padding: const EdgeInsets.all(8),
                     child: ElevatedButton(
                       child:
@@ -156,7 +153,7 @@ class _MyTapBarState extends State<MyTapBar> {
                         }
                       },
                     ),
-                  )
+                 ) */
                 ],
               ),
             ),
@@ -172,7 +169,6 @@ class _MyTapBarState extends State<MyTapBar> {
       ),
     );
   }
-
 
   Widget shopsListView() {
     return FutureBuilder<List>(
@@ -300,13 +296,16 @@ class _MyTapBarState extends State<MyTapBar> {
   void initState() {
     super.initState();
     //Provider.of<ConnectionProvider>(context, listen: false).loadClientesFromDB();
-        municipios=Provider.of<ConnectionProvider>(context,listen: false).getAllMunicipios();
-       
-        Provider.of<MunicipioProvider>(context,listen: false).initMunicipios(municipios);
-     shops= Provider.of<ConnectionProvider>(context,listen: false).getAllShopFromMun(2311);
-     
-        // ignore: unnecessary_statements
-       
+    municipios = Provider.of<ConnectionProvider>(context, listen: false)
+        .getAllMunicipios();
+
+    Provider.of<MunicipioProvider>(context, listen: false)
+        .initMunicipios(municipios);
+    shops = Provider.of<ConnectionProvider>(context, listen: false)
+        .getAllShopFromMun(2311);
+
+    // ignore: unnecessary_statements
+
     ///   Provider.of<ShopProvider>(context,listen: false).initShopList(shops);
     // Provider.of<ClienteProvider>(context).inicializarClientesSinConexion();
     // shops = Provider.of<ShopProvider>(context, listen: false).allShopsFromPlY();
@@ -359,19 +358,7 @@ return DropdownButton<Shop>(
 
 */
 
-
-
-
- }
-
-
-
-
-
-
-
-
-
+}
 
 //Search Bar
 class ProductSearchBar extends StatefulWidget {
@@ -416,7 +403,7 @@ class _HomeState extends State<Home> {
   //TextEditingController, the text field updates value and the
   //controller notifies its listeners.
   var _searchview = new TextEditingController();
- late Future<List<Product>>products;
+  late Future<List<Product>> products;
   bool _firstSearch = true;
   String _query = "";
   //late Future<List<Product>> products;
@@ -426,9 +413,9 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-      products =
-        Provider.of<ConnectionProvider>(context, listen: false).getAllProducts(); 
-        Provider.of<ProductProvider>(context,listen: false).initProduct(products);
+    products = Provider.of<ConnectionProvider>(context, listen: false)
+        .getAllProducts();
+    Provider.of<ProductProvider>(context, listen: false).initProduct(products);
 
     _nebulae = [];
 
@@ -498,78 +485,72 @@ class _HomeState extends State<Home> {
 
   //Create a ListView widget
   Widget _createListView() {
-  return  FutureBuilder<List<Product>>(
+    return FutureBuilder<List<Product>>(
         future: products,
         builder: (contex, snapshot) {
           if (snapshot.hasData) {
             return Flexible(
-      child: ListView.builder(
-          itemCount: snapshot.data!.length,//products.length,
-          itemBuilder: (BuildContext context, int index) {
-            return Card(
-              color: Colors.lightBlue[100],
-              elevation: 5.0,
-              child: Container(
-                margin: EdgeInsets.all(15.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      //"${products[index].productName}",
-                      '${snapshot.data![index].productName}',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+              child: ListView.builder(
+                  itemCount: snapshot.data!.length, //products.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Card(
+                      color: Colors.lightBlue[100],
+                      elevation: 5.0,
+                      child: Container(
+                        margin: EdgeInsets.all(15.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '${snapshot.data![index].productName}',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  bool cola = Provider.of<LineProvider>(context,
+                                          listen: false)
+                                      .colaCreada;
+
+                                  if (cola) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            duration: Duration(seconds: 2),
+                                            content: Text(
+                                                '${snapshot.data![index].productName} agregado')));
+
+                                    Provider.of<LineProvider>(context,
+                                            listen: false)
+                                        .addProducto(snapshot
+                                            .data![index].productName[index]);
+                                  } else
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            duration: Duration(seconds: 2),
+                                            content: Text(
+                                                'No puede agregar un producto sin haber creado la cola')));
+                                },
+                                child: Text('Agregar',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    )))
+                          ],
+                        ),
                       ),
-                    ),
-                    ElevatedButton(
-                        onPressed: () {
-                          bool cola =
-                              Provider.of<LineProvider>(context, listen: false)
-                                  .colaCreada;
-
-                          if (cola) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                duration: Duration(seconds: 2),
-                                content: Text('${snapshot.data![index].productName} agregado')));
-
-                            Provider.of<LineProvider>(context, listen: false)
-                                .anadirProd(snapshot.data![index].productName[index]);
-                          } else
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                duration: Duration(seconds: 2),
-                                content: Text(
-                                    'No puede agregar un producto sin haber creado la cola')));
-                        },
-                        child: Text('Agregar',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                            )))
-                  ],
-                ),
-              ),
+                    );
+                  }),
             );
-            
-           }),
-                  
-          );
-    
-  }
-  else
-if (snapshot.hasError) {
+          } else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
-        return CircularProgressIndicator();  
+          return CircularProgressIndicator();
+        });
   }
-        
 
-);
-
-
-  } 
-  
   /*else if (snapshot.hasError) {
             return Text("${snapshot.error}");
           }
@@ -577,9 +558,8 @@ if (snapshot.hasError) {
 
   //Perform actual search
   Widget _performSearch() {
-     List<Product> nombreProductos = Provider.of<ProductProvider>(context)
-        .products
-        ;
+    List<Product> nombreProductos =
+        Provider.of<ProductProvider>(context).products;
 
     _filterList = [];
     for (int i = 0; i < _nebulae.length; i++) {
@@ -625,7 +605,7 @@ if (snapshot.hasError) {
                                     Text('${_filterList[index]} agregado')));
 
                             Provider.of<LineProvider>(context, listen: false)
-                                .anadirProd(_filterList[index]);
+                                .addProducto(_filterList[index]);
                           } else
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 duration: Duration(seconds: 2),

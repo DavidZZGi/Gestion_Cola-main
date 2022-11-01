@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:line_management/model/client.dart';
 import 'package:line_management/provider/clientProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
@@ -20,27 +22,26 @@ class _LineformState extends State<Lineform> {
   final _nameTextController = TextEditingController();
   final _apellidotextController = TextEditingController();
   final _ciTextController = TextEditingController();
- 
 
- @override
+  @override
   void dispose() {
-  
     _nameTextController.dispose();
     _apellidotextController.dispose();
     _ciTextController.dispose();
     super.dispose();
   }
 
+  final formKey = GlobalKey<FormBuilderState>();
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Registrar Clientes'),
       ),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-        child: Form(
+        child: FormBuilder(
+          key: formKey,
           child: ListView(
             children: [
               Center(
@@ -57,16 +58,22 @@ class _LineformState extends State<Lineform> {
                   Flexible(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
+                      child: FormBuilderTextField(
+                        name: 'Nombre',
                         controller: _nameTextController,
                         decoration: const InputDecoration(labelText: 'Nombre'),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: FormBuilderValidators.compose([]),
                       ),
                     ),
                   ),
                   Expanded(
-                    child: TextFormField(
+                    child: FormBuilderTextField(
+                      name: 'Apellidos',
                       controller: _apellidotextController,
                       decoration: const InputDecoration(labelText: 'Apellidos'),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: FormBuilderValidators.compose([]),
                     ),
                   ),
                 ],
@@ -76,42 +83,67 @@ class _LineformState extends State<Lineform> {
                   Flexible(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: TextFormField(
+                      child: FormBuilderTextField(
+                        name: 'Carnet de Identidad',
                         controller: _ciTextController,
                         decoration: const InputDecoration(
                             labelText: 'Carnet de Identidad'),
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.numeric(),
+                          FormBuilderValidators.minLength(11),
+                          FormBuilderValidators.maxLength(11),
+                        ]),
                       ),
                     ),
                   ),
-                 
                 ],
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(onPressed: () {
-                  
-                  if(_nameTextController.value.text.isNotEmpty && _apellidotextController.value.text.isNotEmpty && _ciTextController.value.text.isNotEmpty){
-                   Provider.of<ClienteProvider>(context,listen: false).addCliente(Cliente( carnetIdentidad: _ciTextController.text, nombre: _nameTextController.text, apellidos: _apellidotextController.text));
-                   Provider.of<ConnectionProvider>(context,listen: false).createCliente(Cliente( carnetIdentidad: _ciTextController.text, nombre: _nameTextController.text, apellidos: _apellidotextController.text));
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content:
-                                    Text('Cliente insertado en la cola')));
-                                     _nameTextController.clear();
-                                     _apellidotextController.clear();
-                                     _ciTextController.clear();
-                                     
-                  }
-                 
-                  else{
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content:
-                                    Text('No puede dejar campos vacios')));
-                  }
-
-                                  
-
-
-                }, child: Text('Enviar')),
+                child: ElevatedButton(
+                    onPressed: () {
+                      /*   if (_nameTextController.value.text.isNotEmpty &&
+                          _apellidotextController.value.text.isNotEmpty &&
+                          _ciTextController.value.text.isNotEmpty) {
+                        Provider.of<ClienteProvider>(context, listen: false)
+                            .addCliente(Cliente(
+                                carnetIdentidad: _ciTextController.text,
+                                nombre: _nameTextController.text,
+                                apellidos: _apellidotextController.text));
+                        Provider.of<ConnectionProvider>(context, listen: false)
+                            .createCliente(Cliente(
+                                carnetIdentidad: _ciTextController.text,
+                                nombre: _nameTextController.text,
+                                apellidos: _apellidotextController.text));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Cliente insertado en la cola')));
+                        _nameTextController.clear();
+                        _apellidotextController.clear();
+                        _ciTextController.clear();
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('No puede dejar campos vacios')));
+                      }*/
+                      if (formKey.currentState!.saveAndValidate()) {
+                        /*  Provider.of<ClienteProvider>(context, listen: false)
+                            .addCliente(Cliente(
+                                carnetIdentidad: _ciTextController.text,
+                                nombre: _nameTextController.text,
+                                apellidos: _apellidotextController.text));*/
+                        Provider.of<ConnectionProvider>(context, listen: false)
+                            .insertClienteEnBDLimpa(Cliente(
+                                carnetIdentidad: _ciTextController.text,
+                                nombre: _nameTextController.text,
+                                apellidos: _apellidotextController.text));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text('Cliente insertado en la cola')));
+                        _nameTextController.clear();
+                        _apellidotextController.clear();
+                        _ciTextController.clear();
+                      }
+                    },
+                    child: Text('Enviar')),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -158,8 +190,8 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
- late Cliente cliente;
- bool info=true;
+  late Cliente cliente;
+  bool info = true;
   Barcode? result;
   QRViewController? controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
@@ -174,21 +206,24 @@ class _QRViewExampleState extends State<QRViewExample> {
     }
     controller!.resumeCamera();
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-   
   }
+
   @override
   Widget build(BuildContext context) {
-    if (result != null && info){
-  cliente=Provider.of<ClienteProvider>(context,listen: false).stringToCliente(result!.code!.toLowerCase());
-  Provider.of<ClienteProvider>(context,listen: false).addCliente(cliente);
-  Provider.of<ConnectionProvider>(context,listen: false).createCliente(cliente);
-  print(cliente);
-  info=false;
-  }
+    if (result != null && info) {
+      cliente = Provider.of<ClienteProvider>(context, listen: false)
+          .stringToCliente(result!.code!.toLowerCase());
+      Provider.of<ClienteProvider>(context, listen: false).addCliente(cliente);
+      Provider.of<ConnectionProvider>(context, listen: false)
+          .createCliente(cliente);
+      print(cliente);
+      info = false;
+    }
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -201,17 +236,10 @@ class _QRViewExampleState extends State<QRViewExample> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
                   if (result != null)
-                   
-                     Text(
+                    Text(
                         'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
-                    
-                   
-                        
                   else
                     const Text('Escanea Código'),
-
-                   
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -314,9 +342,8 @@ class _QRViewExampleState extends State<QRViewExample> {
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         result = scanData;
-        
+      });
     });
-  });
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {

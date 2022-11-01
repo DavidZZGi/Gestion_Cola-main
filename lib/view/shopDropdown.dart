@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:line_management/model/shop.dart';
 import 'package:line_management/provider/connectionProvider.dart';
+import 'package:line_management/provider/lineProvider.dart';
 import 'package:line_management/provider/munprovider.dart';
 import 'package:provider/provider.dart';
 
@@ -23,12 +26,21 @@ class _ShopDropdownState extends State<ShopDropdown> {
     super.initState();
   }
 
+  // ignore: non_constant_identifier_names
+  int currentShopPosition(dynamic shops, String value) {
+    for (int i = 0; i < shops.length; i++) {
+      if (shops[i].name == value) return i;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     int shopPos = 0;
     int munSelected = Provider.of<MunicipioProvider>(context).idActive;
     shops = Provider.of<ConnectionProvider>(context, listen: false)
         .getAllShopFromMun(munSelected);
+    final finalShops = shops;
     return FutureBuilder(
       future: shops,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -54,9 +66,10 @@ class _ShopDropdownState extends State<ShopDropdown> {
                     setState(() {
                       //Buscar el valor de shopPos en el snapshop (Es lo que me falta)
                       dropDownValue = value!;
+                      shopPos = currentShopPosition(snapshot.data, value);
+
                       Provider.of<ShopProvider>(context, listen: false)
                           .setshopSelected(true);
-                      // Provider.of<ShopProvider>(context,listen: false).idNomShop(value);
                     });
                   },
                   value: snapshot.data[shopPos].name,

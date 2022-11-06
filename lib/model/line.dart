@@ -1,23 +1,16 @@
-import 'package:line_management/model/Product.dart';
 import 'package:line_management/model/client.dart';
 
 class Line {
-int idLine;
-int idMun;
-int idTienda;
-DateTime date;
-  int idproducts;
+  String idMun;
+  String idTienda;
+  DateTime date;
+  List<String> nomProducts;
   List<Cliente> clients;
 
   Line(
-      {required this.idLine,
-      required this.idMun,
-      required this.idproducts,
+      {required this.idMun,
+      required this.nomProducts,
       required this.clients,
       required this.idTienda,
-      required this.date
-      });
-
-
-      
+      required this.date});
 }

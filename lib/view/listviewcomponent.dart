@@ -4,6 +4,9 @@ import 'package:line_management/provider/clientProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:provider/provider.dart';
 
+import '../model/estados.dart';
+import '../provider/lineProvider.dart';
+
 class MylistView extends StatefulWidget {
   @override
   State<MylistView> createState() => _MylistViewState();
@@ -26,13 +29,13 @@ class _MylistViewState extends State<MylistView> {
   @override
   void initState() {
     super.initState();
-    Provider.of<ConnectionProvider>(context, listen: false)
-        .loadClientesFromDB();
+    // Provider.of<ConnectionProvider>(context, listen: false)
+    //     .loadClientesFromDB();
   }
 
   @override
   Widget build(BuildContext context) {
-    clientes = Provider.of<ConnectionProvider>(context).clientesDB;
+    clientes = Provider.of<LineProvider>(context).clientes;
     /*clientesAdds=Provider.of<ClienteProvider>(context).listacliente;
     for (var element in clientesAdds) {
       if (!clientes.contains(element)) clientes.add(element);
@@ -59,11 +62,14 @@ class _MylistViewState extends State<MylistView> {
                   content:
                       Text('${clientes[i].nombre} fue removido de la cola')));
               setState(() {
-                Provider.of<ConnectionProvider>(context, listen: false)
+                /*    Provider.of<ConnectionProvider>(context, listen: false)
                     .deleteCliente(cliente.carnetIdentidad);
                 Provider.of<ClienteProvider>(context, listen: false)
                     .removeCliente(cliente);
-                clientes.remove(cliente);
+                clientes.remove(cliente);*/
+                Provider.of<LineProvider>(context, listen: false)
+                    .clientes
+                    .remove(cliente);
               });
             },
             child: Card(
@@ -74,10 +80,39 @@ class _MylistViewState extends State<MylistView> {
                   size: 30,
                   color: Colors.black,
                 ),
-                title: Text(
-                  '${clientes[i].nombre}',
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold, color: Colors.black45),
+                title: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${clientes[i].nombre}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black45,
+                          fontSize: 18.0),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateColor.resolveWith(
+                                (states) => Color.fromARGB(255, 67, 65, 65))),
+                        onPressed: (() {}),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                              child: Text('Estado'),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 5),
+                              child: Text(
+                                  '${Estados.getEstadoName(clientes[i].idEstado)}'),
+                            )
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
                 ),
                 subtitle: Text('${clientes[i].carnetIdentidad}'),
               ),

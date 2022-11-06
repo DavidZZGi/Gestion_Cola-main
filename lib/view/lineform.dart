@@ -8,6 +8,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:line_management/model/client.dart';
 import 'package:line_management/provider/clientProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
+import 'package:line_management/provider/lineProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -131,11 +132,21 @@ class _LineformState extends State<Lineform> {
                                 carnetIdentidad: _ciTextController.text,
                                 nombre: _nameTextController.text,
                                 apellidos: _apellidotextController.text));*/
-                        Provider.of<ConnectionProvider>(context, listen: false)
+                        /* Provider.of<ConnectionProvider>(context, listen: false)
                             .insertClienteEnBDLimpa(Cliente(
                                 carnetIdentidad: _ciTextController.text,
                                 nombre: _nameTextController.text,
                                 apellidos: _apellidotextController.text));
+*/
+                        Provider.of<LineProvider>(context, listen: false)
+                            .clientes
+                            .add(Cliente(
+                              carnetIdentidad: _ciTextController.text,
+                              nombre: _nameTextController.text,
+                              apellidos: _apellidotextController.text,
+                              idEstado: 1,
+                            ));
+
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text('Cliente insertado en la cola')));
                         _nameTextController.clear();
@@ -209,7 +220,6 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 

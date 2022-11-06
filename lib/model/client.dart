@@ -1,30 +1,35 @@
+import 'package:line_management/model/estados.dart';
+
 class Cliente {
- // int idCliente;
+  // int idCliente;
   String nombre;
   String apellidos;
   String carnetIdentidad;
+  int idEstado;
 
   Cliente(
-      {//required this.idCliente,
+      { //required this.idCliente,
+      required this.idEstado,
       required this.carnetIdentidad,
       required this.nombre,
       required this.apellidos});
 
   factory Cliente.fromJson(Map<String, dynamic> json) {
     return Cliente(
-      carnetIdentidad: json['carnetIdentidad'],
-      nombre: json['nombre'],
-    //  idCliente: json['idCliente'],
-      apellidos: json['apellidos'],
-    );
+        carnetIdentidad: json['carnetIdentidad'],
+        nombre: json['nombre'],
+        //  idCliente: json['idCliente'],
+        apellidos: json['apellidos'],
+        idEstado: json['idEstado']);
   }
 
   Map<String, dynamic> toMap() {
     return {
-     // 'idCliente': idCliente,
+      // 'idCliente': idCliente,
       'nombre': nombre,
       'apellidos': apellidos,
       'ci': carnetIdentidad,
+      'idEstado': idEstado,
     };
   }
 
@@ -33,8 +38,7 @@ class Cliente {
     return 'Cliente{ nombre: $nombre, apellidos: $apellidos, carnetIdentidad: $carnetIdentidad}';
   }
 
-
-
- 
-
+  void setEstado(int idEstado) {
+    this.idEstado = idEstado;
+  }
 }

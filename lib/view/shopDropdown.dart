@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:line_management/model/shop.dart';
 import 'package:line_management/provider/connectionProvider.dart';
@@ -40,7 +38,6 @@ class _ShopDropdownState extends State<ShopDropdown> {
     int munSelected = Provider.of<MunicipioProvider>(context).idActive;
     shops = Provider.of<ConnectionProvider>(context, listen: false)
         .getAllShopFromMun(munSelected);
-    final finalShops = shops;
     return FutureBuilder(
       future: shops,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
@@ -66,10 +63,13 @@ class _ShopDropdownState extends State<ShopDropdown> {
                     setState(() {
                       //Buscar el valor de shopPos en el snapshop (Es lo que me falta)
                       dropDownValue = value!;
+                      print(value);
                       shopPos = currentShopPosition(snapshot.data, value);
 
                       Provider.of<ShopProvider>(context, listen: false)
                           .setshopSelected(true);
+                      Provider.of<LineProvider>(context, listen: false)
+                          .setNomTienda(value);
                     });
                   },
                   value: snapshot.data[shopPos].name,

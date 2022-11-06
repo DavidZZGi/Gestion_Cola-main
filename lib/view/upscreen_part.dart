@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_management/model/line.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/lineProvider.dart';
@@ -43,7 +44,27 @@ class UpScreenPart extends StatelessWidget {
                       Icons.upload,
                       color: Colors.white,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Line exportableLine = Line(
+                          idMun:
+                              Provider.of<LineProvider>(context, listen: false)
+                                  .munSelected,
+                          nomProducts:
+                              Provider.of<LineProvider>(context, listen: false)
+                                  .productos,
+                          clients:
+                              Provider.of<LineProvider>(context, listen: false)
+                                  .clientes,
+                          idTienda:
+                              Provider.of<LineProvider>(context, listen: false)
+                                  .nomTienda,
+                          date: DateTime.now());
+                      print(exportableLine.clients);
+                      print(exportableLine.idMun);
+                      print(exportableLine.nomProducts);
+                      print(exportableLine.idTienda);
+                      print(exportableLine.date);
+                    },
                     style: ElevatedButton.styleFrom(
                       fixedSize: const Size(60, 60),
                       shape: const CircleBorder(),
@@ -105,7 +126,7 @@ class UpScreenPart extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Flexible(
-                    child: Text('Importar Colas',
+                    child: Text('Crear subcola',
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
@@ -113,10 +134,12 @@ class UpScreenPart extends StatelessWidget {
                 Flexible(
                   child: ElevatedButton(
                     child: Icon(
-                      Icons.download,
+                      Icons.add,
                       color: Colors.white,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/subcola');
+                    },
                     style: ElevatedButton.styleFrom(
                       fixedSize: const Size(60, 60),
                       shape: const CircleBorder(),

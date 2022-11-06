@@ -10,6 +10,7 @@ class LineProvider with ChangeNotifier {
   late Line line;
   bool colaCreada = false;
   List<String> productos = [];
+  String nomTienda = '';
 
   void addProducto(String nomProducto) {
     if (!productos.contains(nomProducto)) {
@@ -27,6 +28,11 @@ class LineProvider with ChangeNotifier {
 
   void setcolaCreada(bool creada) {
     colaCreada = creada;
+    notifyListeners();
+  }
+
+  void setNomTienda(String value) {
+    nomTienda = value;
     notifyListeners();
   }
 

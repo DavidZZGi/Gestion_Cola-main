@@ -20,7 +20,7 @@ class LineService {
             'Content-Type': 'application/json; charset=UTF-8',
           },
           body: jsonEncode(<String, dynamic>{
-            'id:producto': line.idproducts,
+            'id:producto': line.nomProducts,
             'carnet_identidad': ci,
             'fecha': fecha,
             'id_municipio': line.idMun,

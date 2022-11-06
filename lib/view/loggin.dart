@@ -50,6 +50,7 @@ class _SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Form(
+      key: formKey,
       onChanged: _updateformprogress,
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -127,7 +128,7 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   void _showelcomescreen() {
-    Navigator.of(context).pushNamed('/cubacola');
+    Navigator.of(context).pushNamed('/shopselector');
   }
 
   void _updateformprogress() {

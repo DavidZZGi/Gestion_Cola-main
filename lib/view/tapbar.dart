@@ -66,7 +66,7 @@ class _MyTapBarState extends State<MyTapBar> {
               color: Colors.lightBlue[200],
               padding: EdgeInsets.all(12.0),
               child: ListView(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.all(5),
                 children: [
                   createBox(
                       Text(
@@ -81,20 +81,18 @@ class _MyTapBarState extends State<MyTapBar> {
                             fontSize: 18),
                       )),
                   SizedBox(
-                    height: 10,
+                    height: 6,
                   ),
                   containerGradiente(DropdownMun(), 'Seleccionar municipio'),
                   SizedBox(
-                    height: 10,
+                    height: 6,
                   ),
-                  //UnconstrainedBox(child: Flexible(child: shopsListView())),
-                  //containerGradiente(TiendaDropdown(), 'Seleccionar tienda'),
                   containerGradiente(ShopDropdown(), 'Seleccionar tienda'),
                   SizedBox(
-                    height: 10,
+                    height: 6,
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(6.0),
                     child: ElevatedButton(
                         style: ButtonStyle(),
                         onPressed: () {
@@ -237,7 +235,7 @@ class _MyTapBarState extends State<MyTapBar> {
   Widget createBox(name, subname) {
     return SizedBox(
         width: 300,
-        height: 100,
+        height: 80,
         child: Container(
           decoration: BoxDecoration(
             shape: BoxShape.rectangle,
@@ -524,8 +522,8 @@ class _HomeState extends State<Home> {
 
                                     Provider.of<LineProvider>(context,
                                             listen: false)
-                                        .addProducto(snapshot
-                                            .data![index].productName[index]);
+                                        .addProducto(
+                                            snapshot.data![index].productName);
                                   } else
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(

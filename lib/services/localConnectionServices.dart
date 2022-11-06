@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:line_management/model/Product.dart';
 import 'package:line_management/model/client.dart';
+import 'package:line_management/model/estados.dart';
 import 'package:line_management/model/line.dart';
 import 'package:line_management/model/municipio.dart';
 import 'package:line_management/model/shop.dart';
@@ -11,6 +12,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
+
+import '../model/estados.dart';
 
 class ConnectionServices {
   Database? _db;
@@ -30,6 +33,7 @@ class ConnectionServices {
       _db = await openDatabase(path);
 
       await crearBD(_db!);
+      insertarEstados(_db!);
 
       return true;
     } catch (e) {
@@ -69,7 +73,7 @@ return database;
 */
   Future<void> crearBD(Database db) async {
     await db.execute(
-        'CREATE TABLE IF NOT EXISTS "cliente" ("ci"	TEXT,"nombre"	TEXT,"apellidos"	TEXT,"id_cliente"	INTEGER,PRIMARY KEY("id_cliente" AUTOINCREMENT))');
+        'CREATE TABLE IF NOT EXISTS "cliente" ("ci"	TEXT,"nombre"	TEXT,"apellidos"	TEXT,"idEstado"	INTEGER,"id_cliente"	INTEGER,PRIMARY KEY("id_cliente" AUTOINCREMENT))');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "cola" ("id"	INTEGER,"id_producto"	TEXT,"carnet_identidad"	INTEGER,"fecha"	TEXT,"id_municipio"	INTEGER,"id_tienda"	INTEGER,PRIMARY KEY("id" AUTOINCREMENT))');
     await db.execute(
@@ -78,6 +82,14 @@ return database;
         'CREATE TABLE IF NOT EXISTS "tienda" ("id"	INTEGER,"nombre"	TEXT,"id_municipio"	INTEGER,"activa"	TEXT,PRIMARY KEY("id" AUTOINCREMENT));');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "producto" ("id"	INTEGER,"nombre"	TEXT,"id_tipo"	INTEGER,PRIMARY KEY("id" AUTOINCREMENT));');
+    await db.execute(
+        'CREATE TABLE IF NOT EXISTS "estados" ("id"	INTEGER,"nombre" TEXT);');
+  }
+
+  Future<void> insertarEstados(Database db) async {
+    for (var element in Estados.estados) {
+      await db.insert('estados', element.toMap());
+    }
   }
 
   Future<void> insertClient(Cliente cliente) async {
@@ -111,18 +123,20 @@ return database;
     DateTime fecha = DateTime.now();
     List<int> idClientes =
         line.clients.map((e) => e.carnetIdentidad).toList() as List<int>;
-    //List<int> idProductos = line.products.map((e) => e.id).toList();
+    List<String> idProductos = line.nomProducts;
     if (_db != null) {
-      for (var i = 0; i < idClientes.length; i++) {
-        await _db!.rawInsert(
-            'INSERT INTO cola(id_producto,carnet_identidad,fecha,id_municipio,id_tienda) VALUES(?,?,?,?,?)',
-            [
-              line.idproducts,
-              idClientes[i],
-              fecha.toString(),
-              line.idMun,
-              line.idTienda
-            ]);
+      for (var i = 0; i < idProductos.length; i++) {
+        for (var k = 0; k < idClientes.length; i++) {
+          await _db!.rawInsert(
+              'INSERT INTO cola(id_producto,carnet_identidad,fecha,id_municipio,id_tienda) VALUES(?,?,?,?,?)',
+              [
+                line.nomProducts[i],
+                idClientes[k],
+                fecha.toString(),
+                line.idMun,
+                line.idTienda
+              ]);
+        }
       }
     }
   }
@@ -155,8 +169,7 @@ return database;
             getProductoDadoId(maps[i]['id_producto']) as List<Product>;
         return Line(
           clients: clientes,
-          idproducts: maps[i]['id_producto'],
-          idLine: maps[i]['id'],
+          nomProducts: maps[i]['id_producto'],
           idMun: maps[i]['id_municipio'],
           idTienda: maps[i]['id_tienda'],
           date: maps[i]['fecha'],
@@ -177,7 +190,8 @@ return database;
             // idCliente: clientes[i]['id_cliente'],
             apellidos: clientes[i]['apellidos'],
             carnetIdentidad: clientes[i]['ci'],
-            nombre: clientes[i]['nombre']);
+            nombre: clientes[i]['nombre'],
+            idEstado: clientes[i]['idEstado']);
       });
     } else
       return [];
@@ -193,7 +207,8 @@ return database;
             // idCliente: clientes[i]['id_cliente'],
             apellidos: clientes[i]['apellidos'],
             carnetIdentidad: clientes[i]['ci'],
-            nombre: clientes[i]['nombre']);
+            nombre: clientes[i]['nombre'],
+            idEstado: clientes[i]['idEstado']);
       });
     } else
       return [];
@@ -233,6 +248,17 @@ return database;
         'cliente',
         where: 'ci=?',
         whereArgs: [ci],
+      );
+    }
+  }
+
+  Future<void> deleteClienteDadoId(int id) async {
+    if (_db != null) {
+      Database database = _db!;
+      database.delete(
+        'cliente',
+        where: 'id_cliente=?',
+        whereArgs: [id],
       );
     }
   }

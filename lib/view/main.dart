@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_management/model/ShopSearcher.dart';
 import 'package:line_management/provider/clientProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:line_management/provider/lineProvider.dart';
@@ -7,6 +8,8 @@ import 'package:line_management/provider/productProvider.dart';
 import 'package:line_management/provider/shopProvider.dart';
 import 'package:line_management/services/localConnectionServices.dart';
 import 'package:line_management/view/loading.dart';
+import 'package:line_management/view/shopSelector.dart';
+import 'package:line_management/view/subCola.dart';
 import 'package:provider/provider.dart';
 import './upscreen_part.dart';
 import './tapbar.dart';
@@ -40,7 +43,9 @@ void main() {
         '/loading': (context) => LoadingPage(),
         '/': (context) => const SignUpScreen(),
         '/cubacola': (context) => MyApp(),
-        '/lineform': (context) => Lineform()
+        '/lineform': (context) => Lineform(),
+        '/shopselector': (context) => ShopSelector(),
+        '/subcola': ((context) => SubCola()),
       },
       debugShowCheckedModeBanner: false,
     ),
@@ -68,8 +73,8 @@ print(path);
 
 //Provider.of<ClienteProvider>(context,listen: false).inicializarClientesSinConexion();
 
-    Provider.of<ShopProvider>(context, listen: false).initShopList(
-        Provider.of<ConnectionProvider>(context, listen: false).getAllShops());
+    //Provider.of<ShopProvider>(context, listen: false).initShopList;
+    //    Provider.of<ConnectionProvider>(context, listen: false).getAllShops();
   }
 
   @override

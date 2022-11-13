@@ -73,4 +73,13 @@ class ConnectionProvider with ChangeNotifier {
     notifyListeners();
     return shopMun;
   }
+
+  int idNomShop(String nameShop) {
+    for (var item in shops) {
+      if (item.name == nameShop) {
+        return item.id;
+      }
+    }
+    return 0;
+  }
 }

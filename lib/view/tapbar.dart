@@ -1,5 +1,6 @@
 import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:line_management/model/Product.dart';
 import 'package:line_management/model/municipio.dart';
 
@@ -110,6 +111,9 @@ class _MyTapBarState extends State<MyTapBar> {
                             creoCola = true;
                             Provider.of<LineProvider>(context, listen: false)
                                 .setcolaCreada(creoCola);
+                            Provider.of<LineProvider>(context, listen: false)
+                                .clientes
+                                .clear();
                           } else if (!munSelected && selectShop) {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 duration: Duration(seconds: 2),
@@ -293,7 +297,6 @@ class _MyTapBarState extends State<MyTapBar> {
   @override
   void initState() {
     super.initState();
-    //Provider.of<ConnectionProvider>(context, listen: false).loadClientesFromDB();
     municipios = Provider.of<ConnectionProvider>(context, listen: false)
         .getAllMunicipios();
 
@@ -301,12 +304,7 @@ class _MyTapBarState extends State<MyTapBar> {
         .initMunicipios(municipios);
     shops = Provider.of<ConnectionProvider>(context, listen: false)
         .getAllShopFromMun(2311);
-
-    // ignore: unnecessary_statements
-
-    ///   Provider.of<ShopProvider>(context,listen: false).initShopList(shops);
-    // Provider.of<ClienteProvider>(context).inicializarClientesSinConexion();
-    // shops = Provider.of<ShopProvider>(context, listen: false).allShopsFromPlY();
+    initializeDateFormatting();
   }
 
 /*

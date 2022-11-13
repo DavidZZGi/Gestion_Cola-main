@@ -75,7 +75,7 @@ return database;
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "cliente" ("ci"	TEXT,"nombre"	TEXT,"apellidos"	TEXT,"idEstado"	INTEGER,"id_cliente"	INTEGER,PRIMARY KEY("id_cliente" AUTOINCREMENT))');
     await db.execute(
-        'CREATE TABLE IF NOT EXISTS "cola" ("id"	INTEGER,"id_producto"	TEXT,"carnet_identidad"	INTEGER,"fecha"	TEXT,"id_municipio"	INTEGER,"id_tienda"	INTEGER,PRIMARY KEY("id" AUTOINCREMENT))');
+        'CREATE TABLE IF NOT EXISTS "cola" ("id"	INTEGER,"id_producto"	TEXT,"carnet_identidad"	INTEGER,"fecha"	TEXT,"id_municipio"	INTEGER,"id_tienda"	INTEGER)');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "municipio" ("id"	INTEGER,"nombre"	TEXT,"id_provincia"	INTEGER,"poblacion"	INTEGER,"nombre_corto"	TEXT,PRIMARY KEY("id" AUTOINCREMENT));');
     await db.execute(
@@ -168,6 +168,7 @@ return database;
         List<Product> productos =
             getProductoDadoId(maps[i]['id_producto']) as List<Product>;
         return Line(
+          id: maps[i]['id'],
           clients: clientes,
           nomProducts: maps[i]['id_producto'],
           idMun: maps[i]['id_municipio'],

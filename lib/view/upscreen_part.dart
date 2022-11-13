@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:line_management/model/line.dart';
+import 'package:line_management/provider/connectionProvider.dart';
+import 'package:line_management/provider/shopProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/lineProvider.dart';
@@ -45,7 +47,29 @@ class UpScreenPart extends StatelessWidget {
                       color: Colors.white,
                     ),
                     onPressed: () {
+                      int construirIdCola(int cantDeColasCreadas) {
+                        String date =
+                            Provider.of<LineProvider>(context, listen: false)
+                                .getSixDigitDate()
+                                .toString();
+                        String codInit = '00';
+                        int idShop = Provider.of<ConnectionProvider>(context,
+                                listen: false)
+                            .idNomShop(Provider.of<LineProvider>(context,
+                                    listen: false)
+                                .nomTienda);
+                        String idStrShop = idShop.toString();
+                        String idCola = idStrShop + date + codInit;
+                        int result = int.parse(idCola);
+                        result += cantDeColasCreadas;
+                        cantDeColasCreadas++;
+                        return result;
+                      }
+
                       Line exportableLine = Line(
+                          id: construirIdCola(
+                              Provider.of<LineProvider>(context, listen: false)
+                                  .cantColasCreadas),
                           idMun:
                               Provider.of<LineProvider>(context, listen: false)
                                   .munSelected,
@@ -63,7 +87,7 @@ class UpScreenPart extends StatelessWidget {
                       print(exportableLine.idMun);
                       print(exportableLine.nomProducts);
                       print(exportableLine.idTienda);
-                      print(exportableLine.date);
+                      print(exportableLine.id);
                     },
                     style: ElevatedButton.styleFrom(
                       fixedSize: const Size(60, 60),

@@ -34,12 +34,14 @@ class ShopProvider with ChangeNotifier {
     shops = await bdShops;
   }
 
-  void idNomShop(String nameShop) {
+  int idNomShop(String nameShop) {
     for (var item in shops) {
       if (item.name == nameShop) {
-        idShopSelected = item.idMunicipio;
+        idShopSelected = item.id;
+        return idShopSelected;
       }
     }
+    return idShopSelected;
   }
 
   ShopProvider();

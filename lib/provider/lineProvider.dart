@@ -1,4 +1,7 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:line_management/model/client.dart';
 import 'package:line_management/model/line.dart';
 
@@ -11,6 +14,7 @@ class LineProvider with ChangeNotifier {
   bool colaCreada = false;
   List<String> productos = [];
   String nomTienda = '';
+  int cantColasCreadas = 0;
 
   void addProducto(String nomProducto) {
     if (!productos.contains(nomProducto)) {
@@ -34,6 +38,19 @@ class LineProvider with ChangeNotifier {
   void setNomTienda(String value) {
     nomTienda = value;
     notifyListeners();
+  }
+
+  int getSixDigitDate() {
+    String result = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    String sixDigitDate = result.substring(2);
+    sixDigitDate = sixDigitDate.replaceAll('-', '');
+    sixDigitDate = sixDigitDate.trim();
+    notifyListeners();
+    return int.parse(sixDigitDate);
+  }
+
+  void updateCantColas() {
+    cantColasCreadas++;
   }
 
 /*

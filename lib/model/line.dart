@@ -1,6 +1,7 @@
 import 'package:line_management/model/client.dart';
 
 class Line {
+  int id;
   String idMun;
   String idTienda;
   DateTime date;
@@ -8,7 +9,8 @@ class Line {
   List<Cliente> clients;
 
   Line(
-      {required this.idMun,
+      {required this.id,
+      required this.idMun,
       required this.nomProducts,
       required this.clients,
       required this.idTienda,

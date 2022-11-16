@@ -15,6 +15,8 @@ class LineProvider with ChangeNotifier {
   List<String> productos = [];
   String nomTienda = '';
   int cantColasCreadas = 0;
+  int idTienda = 0;
+  List<String> nombresTienda = [];
 
   void addProducto(String nomProducto) {
     if (!productos.contains(nomProducto)) {
@@ -37,6 +39,7 @@ class LineProvider with ChangeNotifier {
 
   void setNomTienda(String value) {
     nomTienda = value;
+    nombresTienda.add(nomTienda);
     notifyListeners();
   }
 

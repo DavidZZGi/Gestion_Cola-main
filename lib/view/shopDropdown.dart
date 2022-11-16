@@ -70,6 +70,8 @@ class _ShopDropdownState extends State<ShopDropdown> {
                           .setshopSelected(true);
                       Provider.of<LineProvider>(context, listen: false)
                           .setNomTienda(value);
+                      Provider.of<ShopProvider>(context, listen: false)
+                          .idNomShop(value);
                     });
                   },
                   value: snapshot.data[shopPos].name,

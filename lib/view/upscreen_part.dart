@@ -46,49 +46,7 @@ class UpScreenPart extends StatelessWidget {
                       Icons.upload,
                       color: Colors.white,
                     ),
-                    onPressed: () {
-                      int construirIdCola(int cantDeColasCreadas) {
-                        String date =
-                            Provider.of<LineProvider>(context, listen: false)
-                                .getSixDigitDate()
-                                .toString();
-                        String codInit = '00';
-                        int idShop = Provider.of<ConnectionProvider>(context,
-                                listen: false)
-                            .idNomShop(Provider.of<LineProvider>(context,
-                                    listen: false)
-                                .nomTienda);
-                        String idStrShop = idShop.toString();
-                        String idCola = idStrShop + date + codInit;
-                        int result = int.parse(idCola);
-                        result += cantDeColasCreadas;
-                        cantDeColasCreadas++;
-                        return result;
-                      }
-
-                      Line exportableLine = Line(
-                          id: construirIdCola(
-                              Provider.of<LineProvider>(context, listen: false)
-                                  .cantColasCreadas),
-                          idMun:
-                              Provider.of<LineProvider>(context, listen: false)
-                                  .munSelected,
-                          nomProducts:
-                              Provider.of<LineProvider>(context, listen: false)
-                                  .productos,
-                          clients:
-                              Provider.of<LineProvider>(context, listen: false)
-                                  .clientes,
-                          idTienda:
-                              Provider.of<LineProvider>(context, listen: false)
-                                  .nomTienda,
-                          date: DateTime.now());
-                      print(exportableLine.clients);
-                      print(exportableLine.idMun);
-                      print(exportableLine.nomProducts);
-                      print(exportableLine.idTienda);
-                      print(exportableLine.id);
-                    },
+                    onPressed: () {},
                     style: ElevatedButton.styleFrom(
                       fixedSize: const Size(60, 60),
                       shape: const CircleBorder(),
@@ -114,13 +72,8 @@ class UpScreenPart extends StatelessWidget {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
-                            child: Text('Insertar clientes'),
-                            onPressed: value.colaCreada
-                                ? () {
-                                    Navigator.of(context)
-                                        .pushNamed('/lineform');
-                                  }
-                                : null),
+                            child: Text('Cambiar Estados'),
+                            onPressed: value.colaCreada ? () {} : null),
                       );
                     },
                     /*child: Padding(

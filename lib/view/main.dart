@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:line_management/model/ShopSearcher.dart';
+import 'package:line_management/provider/GestionadorProvider.dart';
 import 'package:line_management/provider/clientProvider.dart';
+import 'package:line_management/provider/clientesColasActivasProvider.dart';
+import 'package:line_management/provider/colasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:line_management/provider/lineProvider.dart';
 import 'package:line_management/provider/munprovider.dart';
 import 'package:line_management/provider/productProvider.dart';
+import 'package:line_management/provider/productosColasProvider.dart';
 import 'package:line_management/provider/shopProvider.dart';
 import 'package:line_management/services/localConnectionServices.dart';
+import 'package:line_management/view/createLineView.dart';
 import 'package:line_management/view/loading.dart';
 import 'package:line_management/view/shopSelector.dart';
 import 'package:line_management/view/subCola.dart';
@@ -25,7 +30,11 @@ void main() {
       ChangeNotifierProvider(create: (context) => ShopProvider()),
       ChangeNotifierProvider(create: (context) => ProductProvider()),
       ChangeNotifierProvider(create: (context) => ConnectionProvider()),
-      ChangeNotifierProvider(create: (context) => LineProvider())
+      ChangeNotifierProvider(create: (context) => LineProvider()),
+      ChangeNotifierProvider(create: (context) => ColasActivasProvider()),
+      ChangeNotifierProvider(create: (context) => ProductosColasProvider()),
+      ChangeNotifierProvider(create: (context) => ClienteColaActivaProvider()),
+      ChangeNotifierProvider(create: (context) => GestionadorProvider()),
     ],
     child: MaterialApp(
       supportedLocales: [
@@ -46,6 +55,7 @@ void main() {
         '/lineform': (context) => Lineform(),
         '/shopselector': (context) => ShopSelector(),
         '/subcola': ((context) => SubCola()),
+        '/createline': ((context) => CreateLineWidget())
       },
       debugShowCheckedModeBanner: false,
     ),

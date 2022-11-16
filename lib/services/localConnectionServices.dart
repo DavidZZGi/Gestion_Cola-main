@@ -13,7 +13,10 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
 
+import '../model/cliente-colas-activas.dart';
+import '../model/colas-activas.dart';
 import '../model/estados.dart';
+import '../model/productos-colas.dart';
 
 class ConnectionServices {
   Database? _db;
@@ -46,7 +49,7 @@ class ConnectionServices {
     var dbDir = await getDatabasesPath();
     var dbPath = join(dbDir, 'app.db');
     await deleteDatabase(dbPath);
-    ByteData data = await rootBundle.load("assets/ColaSqlite.db");
+    ByteData data = await rootBundle.load("assets/Real_Cola.db");
     List<int> bytes =
         data.buffer.asInt8List(data.offsetInBytes, data.lengthInBytes);
     await File(dbPath).writeAsBytes(bytes);
@@ -72,23 +75,119 @@ return database;
 }
 */
   Future<void> crearBD(Database db) async {
-    await db.execute(
+    /*await db.execute(
         'CREATE TABLE IF NOT EXISTS "cliente" ("ci"	TEXT,"nombre"	TEXT,"apellidos"	TEXT,"idEstado"	INTEGER,"id_cliente"	INTEGER,PRIMARY KEY("id_cliente" AUTOINCREMENT))');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "cola" ("id"	INTEGER,"id_producto"	TEXT,"carnet_identidad"	INTEGER,"fecha"	TEXT,"id_municipio"	INTEGER,"id_tienda"	INTEGER)');
+        */
     await db.execute(
-        'CREATE TABLE IF NOT EXISTS "municipio" ("id"	INTEGER,"nombre"	TEXT,"id_provincia"	INTEGER,"poblacion"	INTEGER,"nombre_corto"	TEXT,PRIMARY KEY("id" AUTOINCREMENT));');
+        'CREATE TABLE IF NOT EXISTS "municipio" ("id"	INTEGER,"nombre"	TEXT,"id_provincia"	INTEGER,PRIMARY KEY("id" AUTOINCREMENT));');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "tienda" ("id"	INTEGER,"nombre"	TEXT,"id_municipio"	INTEGER,"activa"	TEXT,PRIMARY KEY("id" AUTOINCREMENT));');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "producto" ("id"	INTEGER,"nombre"	TEXT,"id_tipo"	INTEGER,PRIMARY KEY("id" AUTOINCREMENT));');
     await db.execute(
-        'CREATE TABLE IF NOT EXISTS "estados" ("id"	INTEGER,"nombre" TEXT);');
+        'CREATE TABLE IF NOT EXISTS "estados_personas" ("id"	INTEGER,"nombre" TEXT);');
+    await db.execute(
+        'CREATE TABLE IF NOT EXISTS "clientes-colas-activas" ("ci"	NVARCHAR(11) NOT NULL,"fv"	NVARCHAR(9),"nombre"	NVARCHAR(50) ,"id_municipio"	INTEGER NOT NULL DEFAULT 0,"fecha_registro"	DATETIME NOT NULL,"fecha_modif"	DATETIME,"id_estado"	INTEGER NOT NULL DEFAULT 1,"id_cola"	INTEGER NOT NULL,PRIMARY KEY("ci","id_cola"));');
+    await db.execute(
+        'CREATE TABLE IF NOT EXISTS "productos_colas" ("id_cola" INTEGER NOT NULL,"id_producto" INTEGER NOT NULL,PRIMARY KEY("id_cola","id_producto"));');
+    await db.execute(
+        'CREATE TABLE IF NOT EXISTS "colas-activas" ("id"	INTEGER NOT NULL UNIQUE,"tienda" INTEGER NOT NULL,"fecha"	DATETIME NOT NULL,PRIMARY KEY("id"));');
+    await db.execute(
+        'CREATE TABLE IF NOT EXISTS "configuracion" ("fecha_nueva_cola"	DATE,"id_nueva_cola"	INTEGER,"subcola_actual"	INTEGER DEFAULT 0,"mensaje_inicial"	NVARCHAR(250),"CI_usuario"	NVARCHAR(11),"Nombre_usuario"	NVARCHAR(50),"telefono_usuario"	NVARCHAR(8),"id_tienda"	INTEGER);');
   }
 
+  //CRUD Clientes-Colas-ACtivas
+  Future<void> insertClienteColaActiva(ClienteColasActivas cliente) async {
+    if (_db != null) {
+      await _db!.insert('clientes-colas-activas', cliente.toMap());
+    }
+  }
+
+  Future<void> insertAllClienteColaActiva(
+      List<ClienteColasActivas> clientes) async {
+    for (var element in clientes) {
+      insertClienteColaActiva(element);
+    }
+  }
+
+  Future<List<ColaAciva>> getAllClientesColasActivas() async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> colasActivas =
+          await _db!.query('colas-activas', distinct: true);
+      return List.generate(colasActivas.length, (i) {
+        print(colasActivas[i]);
+        return ColaAciva(
+            id: colasActivas[i]['id'],
+            fecha: colasActivas[i]['fecha'],
+            idTienda: colasActivas[i]['idTienda']);
+      });
+    } else
+      return [];
+  }
+
+  //Crud Colas-Activas
+  Future<void> insertColaActiva(ColaAciva cola) async {
+    if (_db != null) {
+      await _db!.insert('colas-activas', cola.toMap());
+    }
+  }
+
+  Future<void> insertAllColasActivas(List<ColaAciva> colasActivas) async {
+    for (var element in colasActivas) {
+      insertColaActiva(element);
+    }
+  }
+
+  Future<List<ColaAciva>> getAllColasActivas() async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> colasActivas =
+          await _db!.query('colas-activas', distinct: true);
+      return List.generate(colasActivas.length, (i) {
+        print(colasActivas[i]);
+        return ColaAciva(
+            id: colasActivas[i]['id'],
+            fecha: colasActivas[i]['fecha'],
+            idTienda: colasActivas[i]['idTienda']);
+      });
+    } else
+      return [];
+  }
+
+//Crud Producto-colas
+  Future<void> insertProductosCola(ProductosColas producto) async {
+    if (_db != null) {
+      await _db!.insert('productos_colas', producto.toMap());
+    }
+  }
+
+  Future<void> insertAllProductosCola(
+      List<ProductosColas> productosColas) async {
+    for (var element in productosColas) {
+      insertProductosCola(element);
+    }
+  }
+
+  Future<List<ProductosColas>> getAllProductosColas() async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> productosCola =
+          await _db!.query('productos_colas', distinct: true);
+      return List.generate(productosCola.length, (i) {
+        print(productosCola[i]);
+        return ProductosColas(
+          idCola: productosCola[i]['idCola'],
+          idProducto: productosCola[i]['idProducto'],
+        );
+      });
+    } else
+      return [];
+  }
+
+  ///
   Future<void> insertarEstados(Database db) async {
     for (var element in Estados.estados) {
-      await db.insert('estados', element.toMap());
+      await db.insert('estados_personas', element.toMap());
     }
   }
 
@@ -102,6 +201,7 @@ return database;
     }
   }
 
+/*
   Future<void> insertarCliente(Cliente cliente) async {
     if (_dbcargada != null) {
       await _dbcargada!.insert('cliente', cliente.toMap(),
@@ -109,7 +209,7 @@ return database;
       print(cliente.toMap());
     }
   }
-
+*/
 //Insertar cliente en bd limpia
   Future<void> insertarClienteEnBDLimpia(Cliente cliente) async {
     if (_db != null) {
@@ -229,8 +329,11 @@ return database;
 
   Future<List<Shop>> getTiendaDadoMun(int idMun) async {
     if (_dbcargada != null) {
-      final List<Map<String, dynamic>> shops = await _dbcargada!.query('tienda',
-          where: 'id_municipio=?', whereArgs: [idMun], distinct: true);
+      final List<Map<String, dynamic>> shops = await _dbcargada!.query(
+          'tiendas',
+          where: 'id_municipio=?',
+          whereArgs: [idMun],
+          distinct: true);
       return List.generate(shops.length, (i) {
         return Shop(
             name: shops[i]['nombre'],
@@ -267,7 +370,7 @@ return database;
   Future<List<Product>> getAllProductos() async {
     if (_dbcargada != null) {
       final List<Map<String, dynamic>> maps =
-          await _dbcargada!.query('producto');
+          await _dbcargada!.query('productos');
       return List.generate(maps.length, (i) {
         return Product(
           id: maps[i]['id'],
@@ -282,13 +385,11 @@ return database;
   Future<List<Municipio>> getAllMun() async {
     if (_dbcargada != null) {
       final List<Map<String, dynamic>> maps =
-          await _dbcargada!.query('municipio');
+          await _dbcargada!.query('municipios');
       return List.generate(maps.length, (i) {
         return Municipio(
             idMunicipio: maps[i]['id'],
             nombre: maps[i]['nombre'],
-            nombreCorto: maps[i]['nombre_corto'],
-            poblacion: maps[i]['poblacion'],
             idProvincia: maps[i]['id_provincia']);
       });
     } else
@@ -298,7 +399,7 @@ return database;
   Future<List<Shop>> getAllShops() async {
     if (_dbcargada != null) {
       final List<Map<String, dynamic>> maps =
-          await _dbcargada!.query('tienda', distinct: true);
+          await _dbcargada!.query('tiendas', distinct: true);
       return List.generate(maps.length, (i) {
         return Shop(
           idMunicipio: maps[i]['id_municipio'],

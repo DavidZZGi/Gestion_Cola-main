@@ -6,9 +6,9 @@ class Estados {
 
   static List<Estados> estados = [
     Estados(id: 1, nombre: 'Registrado'),
-    Estados(id: 2, nombre: 'Compro'),
-    Estados(id: 3, nombre: 'Rechazado'),
-    Estados(id: 4, nombre: 'Abandono')
+    Estados(id: 2, nombre: 'Rechazado'),
+    Estados(id: 3, nombre: 'Abandonó'),
+    Estados(id: 4, nombre: 'Compró')
   ];
 
   Map<String, dynamic> toMap() {

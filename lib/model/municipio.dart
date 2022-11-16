@@ -1,22 +1,16 @@
-class Municipio{
-int idMunicipio;
-int idProvincia;
-String nombre;
-String nombreCorto;
-int poblacion;
+class Municipio {
+  int idMunicipio;
+  int idProvincia;
+  String nombre;
 
-Municipio({required this.idMunicipio,required this.nombre,required this.poblacion,required this.nombreCorto,required this.idProvincia});
+  Municipio(
+      {required this.idMunicipio,
+      required this.nombre,
+      required this.idProvincia});
 
-String getnombre()=>this.nombre;
-int getpoblacion()=>this.poblacion;
+  String getnombre() => this.nombre;
 
-void setNombre(String value){
-  this.nombre=value;
-}
-
-void setPoblacion(int value){
-  this.poblacion=value;
-}
-
-
+  void setNombre(String value) {
+    this.nombre = value;
+  }
 }

@@ -7,15 +7,18 @@ import 'package:line_management/services/localConnectionServices.dart';
 import '../model/client.dart';
 
 class ConnectionProvider with ChangeNotifier {
-  ConnectionServices connection = ConnectionServices(); //(dbName: 'db.sqlite');
+  static ConnectionServices connection =
+      ConnectionServices(); //(dbName: 'db.sqlite');
   List<Cliente> clientesDB = [];
   List<Product> products = [];
   List<Municipio> municipios = [];
   List<Shop> shops = [];
   List<Shop> shopMun = [];
+  static bool isConnected = false;
 
   Future<void> getConnection() async {
     await connection.cargarBD();
+    isConnected = true;
     notifyListeners();
   }
 
@@ -24,11 +27,7 @@ class ConnectionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createCliente(Cliente cliente) async {
-    await connection.insertarCliente(cliente);
-    notifyListeners();
-  }
-
+/*
   Future<void> insertCliente(Cliente cliente) async {
     await connection.insertClient(cliente);
     notifyListeners();
@@ -49,7 +48,7 @@ class ConnectionProvider with ChangeNotifier {
 
     notifyListeners();
   }
-
+*/
   Future<List<Product>> getAllProducts() async {
     products = await connection.getAllProductos();
     notifyListeners();

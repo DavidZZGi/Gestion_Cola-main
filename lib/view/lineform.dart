@@ -6,11 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:line_management/model/client.dart';
+import 'package:line_management/model/cliente-colas-activas.dart';
+import 'package:line_management/model/estados.dart';
 import 'package:line_management/provider/clientProvider.dart';
+import 'package:line_management/provider/clientesColasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:line_management/provider/lineProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+
+import '../provider/colasActivasProvider.dart';
+import '../provider/munprovider.dart';
 
 class Lineform extends StatefulWidget {
   Lineform({Key? key}) : super(key: key);
@@ -104,40 +110,37 @@ class _LineformState extends State<Lineform> {
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                     onPressed: () {
-                      /*   if (_nameTextController.value.text.isNotEmpty &&
-                          _apellidotextController.value.text.isNotEmpty &&
-                          _ciTextController.value.text.isNotEmpty) {
-                        Provider.of<ClienteProvider>(context, listen: false)
-                            .addCliente(Cliente(
-                                carnetIdentidad: _ciTextController.text,
-                                nombre: _nameTextController.text,
-                                apellidos: _apellidotextController.text));
-                        Provider.of<ConnectionProvider>(context, listen: false)
-                            .createCliente(Cliente(
-                                carnetIdentidad: _ciTextController.text,
-                                nombre: _nameTextController.text,
-                                apellidos: _apellidotextController.text));
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Cliente insertado en la cola')));
-                        _nameTextController.clear();
-                        _apellidotextController.clear();
-                        _ciTextController.clear();
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('No puede dejar campos vacios')));
-                      }*/
                       if (formKey.currentState!.saveAndValidate()) {
-                        /*  Provider.of<ClienteProvider>(context, listen: false)
-                            .addCliente(Cliente(
-                                carnetIdentidad: _ciTextController.text,
-                                nombre: _nameTextController.text,
-                                apellidos: _apellidotextController.text));*/
-                        /* Provider.of<ConnectionProvider>(context, listen: false)
-                            .insertClienteEnBDLimpa(Cliente(
-                                carnetIdentidad: _ciTextController.text,
-                                nombre: _nameTextController.text,
-                                apellidos: _apellidotextController.text));
-*/
+                        int cantColasCreadas =
+                            Provider.of<ColasActivasProvider>(context,
+                                    listen: false)
+                                .colas
+                                .length;
+                        ClienteColasActivas cliente = ClienteColasActivas(
+                            ci: _ciTextController.text,
+                            fv: '',
+                            fechaRegistro: DateTime.now(),
+                            fechaModificacion: DateTime.now(),
+                            idEstado: Estados.estados[0].id,
+                            idCola: Provider.of<ColasActivasProvider>(context,
+                                    listen: false)
+                                .colas[cantColasCreadas - 1]
+                                .id,
+                            nombre: _nameTextController.text +
+                                _apellidotextController.text,
+                            idMunicipio: Provider.of<MunicipioProvider>(context,
+                                    listen: false)
+                                .idActive);
+                        Provider.of<ClienteColaActivaProvider>(context,
+                                listen: false)
+                            .clienteColasActivas
+                            .add(cliente);
+                        print(cliente.idCola);
+                        print(cliente.ci);
+                        print(cliente.nombre);
+                        print(cliente.idEstado);
+                        print(cliente.fechaRegistro);
+                        print(cliente.idMunicipio);
                         Provider.of<LineProvider>(context, listen: false)
                             .clientes
                             .add(Cliente(
@@ -229,8 +232,7 @@ class _QRViewExampleState extends State<QRViewExample> {
       cliente = Provider.of<ClienteProvider>(context, listen: false)
           .stringToCliente(result!.code!.toLowerCase());
       Provider.of<ClienteProvider>(context, listen: false).addCliente(cliente);
-      Provider.of<ConnectionProvider>(context, listen: false)
-          .createCliente(cliente);
+
       print(cliente);
       info = false;
     }

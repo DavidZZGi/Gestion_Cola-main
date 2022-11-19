@@ -3,7 +3,7 @@ import 'package:line_management/model/colas-activas.dart';
 import 'package:line_management/model/productos-colas.dart';
 
 class Gestionador {
-  static List<ColaAciva> colas = [];
+  static List<ColaActiva> colas = [];
   static List<ProductosColas> productosCola = [];
   static List<ClienteColasActivas> clienteColas = [];
 

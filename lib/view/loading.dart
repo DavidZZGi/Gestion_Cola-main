@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:line_management/provider/colasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -20,9 +21,9 @@ class _LoadingPageState extends State<LoadingPage> {
   appLoading() async {
     await Future.delayed(Duration(milliseconds: 4000), () {
       Provider.of<ConnectionProvider>(context, listen: false).getConnection();
-      Provider.of<ConnectionProvider>(context, listen: false).getAllProducts();
       Provider.of<ConnectionProvider>(context, listen: false)
           .getConnectionBDLimpia();
+      Provider.of<ConnectionProvider>(context, listen: false).getAllProducts();
 
       print('success');
     });

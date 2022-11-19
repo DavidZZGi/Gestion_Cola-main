@@ -1,8 +1,4 @@
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
-import 'package:line_management/provider/lineProvider.dart';
-import 'package:line_management/provider/shopProvider.dart';
 
 import '../model/productos-colas.dart';
 import 'connectionProvider.dart';
@@ -25,5 +21,15 @@ class ProductosColasProvider with ChangeNotifier {
       }
     }
     return productosDeUnaCola;
+  }
+
+  void setIsSelected(bool isSeleted, int pos) {
+    productosCola[pos].setIsSelected(isSeleted);
+    notifyListeners();
+  }
+
+  void removeProductoCola(ProductosColas product) {
+    productosCola.remove(product);
+    notifyListeners();
   }
 }

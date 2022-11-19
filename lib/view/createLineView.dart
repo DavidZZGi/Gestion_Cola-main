@@ -21,9 +21,12 @@ class CreateLineWidget extends StatefulWidget {
 class _CreateLineWidgetState extends State<CreateLineWidget> {
   bool munSelected = false;
   bool creoCola = false;
-  int construirIdCola(int cantDeColasCreadas) {
-    String date = Provider.of<LineProvider>(context, listen: false)
-        .getSixDigitDate()
+  String? fecha;
+  List<ColaActiva>? colasCreadas;
+
+  int construirIdCola(String? fechadb) {
+    String date = Provider.of<ColasActivasProvider>(context, listen: false)
+        .getSixDigitDate(fechadb)
         .toString();
     String codInit = '00';
     int idShop = Provider.of<ConnectionProvider>(context, listen: false)
@@ -31,8 +34,28 @@ class _CreateLineWidgetState extends State<CreateLineWidget> {
     String idStrShop = idShop.toString();
     String idCola = idStrShop + date + codInit;
     int result = int.parse(idCola);
-    result += cantDeColasCreadas;
+
+    result += checkSiSonColasDeLaMismaTienda(idShop);
     return result;
+  }
+
+  int checkSiSonColasDeLaMismaTienda(idShop) {
+    int counter = 0;
+    for (var element in colasCreadas!) {
+      if (element.idTienda == idShop) {
+        counter++;
+      }
+    }
+    return counter;
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fecha = Provider.of<ColasActivasProvider>(context, listen: false).fecha;
+    colasCreadas =
+        Provider.of<ColasActivasProvider>(context, listen: false).colas;
   }
 
   @override
@@ -108,14 +131,33 @@ class _CreateLineWidgetState extends State<CreateLineWidget> {
                                       listen: false)
                                   .colas
                                   .length;
-                          ColaAciva cola = ColaAciva(
-                              id: construirIdCola(cantColasCreadas),
+                          ColaActiva cola = ColaActiva(
+                              id: construirIdCola(fecha),
                               idTienda: idTienda,
                               fecha: DateTime.now());
                           Provider.of<ColasActivasProvider>(context,
                                   listen: false)
                               .colas
                               .add(cola);
+                          Provider.of<ColasActivasProvider>(context,
+                                  listen: false)
+                              .setPosColaActiva(cantColasCreadas);
+                          Provider.of<ColasActivasProvider>(context,
+                                  listen: false)
+                              .colas[cantColasCreadas]
+                              .setcantColasdeUnaTienda(
+                                  checkSiSonColasDeLaMismaTienda(idTienda));
+                          List<ColaActiva> colas =
+                              Provider.of<ColasActivasProvider>(context,
+                                      listen: false)
+                                  .colas;
+
+                          if (cantColasCreadas > 0) {
+                            setState(() {
+                              colas[cantColasCreadas - 1].setIsSelected(false);
+                            });
+                          }
+
                           print(cola.id);
                           print(cola.idTienda);
                           print(cola.fecha);

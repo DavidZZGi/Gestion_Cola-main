@@ -1,6 +1,8 @@
 class ProductosColas {
   int idCola;
   int idProducto;
+  bool isSelected = false;
+  String? nombreProducto;
   ProductosColas({required this.idCola, required this.idProducto});
 
   Map<String, dynamic> toMap() {
@@ -16,5 +18,13 @@ class ProductosColas {
 
   void setIdProducto(int idProducto) {
     this.idProducto = idProducto;
+  }
+
+  void setIsSelected(bool selected) {
+    this.isSelected = selected;
+  }
+
+  void setnombreProducto(String nombProducto) {
+    this.nombreProducto = nombProducto;
   }
 }

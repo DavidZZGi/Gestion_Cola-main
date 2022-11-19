@@ -128,7 +128,7 @@ class _SignUpFormState extends State<SignUpForm> {
   }
 
   void _showelcomescreen() {
-    Navigator.of(context).pushNamed('/shopselector');
+    Navigator.of(context).pushNamed('/cubacola');
   }
 
   void _updateformprogress() {

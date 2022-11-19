@@ -16,12 +16,14 @@ class ShopDropdown extends StatefulWidget {
 
 class _ShopDropdownState extends State<ShopDropdown> {
   //
-  String dropDownValue = 'Playa- Mercado 3ra y 8';
+  bool? escogio;
+  String? dropDownValue;
   late Future<List<Shop>> shops;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    escogio = false;
   }
 
   // ignore: non_constant_identifier_names
@@ -38,44 +40,45 @@ class _ShopDropdownState extends State<ShopDropdown> {
     int munSelected = Provider.of<MunicipioProvider>(context).idActive;
     shops = Provider.of<ConnectionProvider>(context, listen: false)
         .getAllShopFromMun(munSelected);
+
     return FutureBuilder(
       future: shops,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? Container(
                 child: DropdownButton<String>(
-                  dropdownColor: Colors.blueAccent,
-                  isDense: true,
-                  isExpanded: true,
-                  iconSize: 42,
-                  iconEnabledColor: Colors.lightBlueAccent,
-                  items: snapshot.data.map<DropdownMenuItem<String>>((item) {
-                    return DropdownMenuItem<String>(
-                      value: item.name,
-                      child: Text(
-                        item.name,
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      //Buscar el valor de shopPos en el snapshop (Es lo que me falta)
-                      dropDownValue = value!;
-                      print(value);
-                      shopPos = currentShopPosition(snapshot.data, value);
+                    dropdownColor: Colors.blueAccent,
+                    isDense: true,
+                    isExpanded: true,
+                    iconSize: 42,
+                    iconEnabledColor: Colors.lightBlueAccent,
+                    items: snapshot.data.map<DropdownMenuItem<String>>((item) {
+                      return DropdownMenuItem<String>(
+                        value: item.name,
+                        child: Text(
+                          item.name,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        //Buscar el valor de shopPos en el snapshop (Es lo que me falta)
+                        escogio = true;
+                        dropDownValue = value;
+                        print(dropDownValue);
+                        shopPos = currentShopPosition(snapshot.data, value!);
 
-                      Provider.of<ShopProvider>(context, listen: false)
-                          .setshopSelected(true);
-                      Provider.of<LineProvider>(context, listen: false)
-                          .setNomTienda(value);
-                      Provider.of<ShopProvider>(context, listen: false)
-                          .idNomShop(value);
-                    });
-                  },
-                  value: snapshot.data[shopPos].name,
-                ),
+                        Provider.of<ShopProvider>(context, listen: false)
+                            .setshopSelected(true);
+                        Provider.of<LineProvider>(context, listen: false)
+                            .setNomTienda(value);
+                        Provider.of<ShopProvider>(context, listen: false)
+                            .idNomShop(value);
+                      });
+                    },
+                    value: snapshot.data[shopPos].name),
               )
             : Container(
                 child: Center(

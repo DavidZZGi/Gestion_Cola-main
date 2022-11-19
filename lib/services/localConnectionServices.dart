@@ -112,13 +112,13 @@ return database;
     }
   }
 
-  Future<List<ColaAciva>> getAllClientesColasActivas() async {
+  Future<List<ColaActiva>> getAllClientesColasActivas() async {
     if (_db != null) {
       final List<Map<String, dynamic>> colasActivas =
           await _db!.query('colas-activas', distinct: true);
       return List.generate(colasActivas.length, (i) {
         print(colasActivas[i]);
-        return ColaAciva(
+        return ColaActiva(
             id: colasActivas[i]['id'],
             fecha: colasActivas[i]['fecha'],
             idTienda: colasActivas[i]['idTienda']);
@@ -128,25 +128,25 @@ return database;
   }
 
   //Crud Colas-Activas
-  Future<void> insertColaActiva(ColaAciva cola) async {
+  Future<void> insertColaActiva(ColaActiva cola) async {
     if (_db != null) {
       await _db!.insert('colas-activas', cola.toMap());
     }
   }
 
-  Future<void> insertAllColasActivas(List<ColaAciva> colasActivas) async {
+  Future<void> insertAllColasActivas(List<ColaActiva> colasActivas) async {
     for (var element in colasActivas) {
       insertColaActiva(element);
     }
   }
 
-  Future<List<ColaAciva>> getAllColasActivas() async {
+  Future<List<ColaActiva>> getAllColasActivas() async {
     if (_db != null) {
       final List<Map<String, dynamic>> colasActivas =
           await _db!.query('colas-activas', distinct: true);
       return List.generate(colasActivas.length, (i) {
         print(colasActivas[i]);
-        return ColaAciva(
+        return ColaActiva(
             id: colasActivas[i]['id'],
             fecha: colasActivas[i]['fecha'],
             idTienda: colasActivas[i]['idTienda']);
@@ -185,6 +185,16 @@ return database;
   }
 
   ///
+  Future<String> getFecha() async {
+    String fecha = '';
+    if (_dbcargada != null) {
+      final res = await _dbcargada!
+          .query('configuracion', columns: ['fecha_nueva_cola']);
+      fecha = res[0]['fecha_nueva_cola'].toString();
+    }
+    return fecha;
+  }
+
   Future<void> insertarEstados(Database db) async {
     for (var element in Estados.estados) {
       await db.insert('estados_personas', element.toMap());

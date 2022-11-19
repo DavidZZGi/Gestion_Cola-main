@@ -41,7 +41,7 @@ dependencies:
   form_builder_validators: ^8.3.0
   flutter_form_builder: ^7.7.0
   flappy_search_bar_ns: ^2.0.2
-  intl: ^0.17.0
+  
   
   
  

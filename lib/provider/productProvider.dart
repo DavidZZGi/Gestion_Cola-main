@@ -5,8 +5,13 @@ import 'package:line_management/services/productoService.dart';
 class ProductProvider with ChangeNotifier {
   ProductoService _productService = ProductoService();
   List<Product> products = [];
-  late int idProductSelected;
+  int? idProductSelected;
   bool agregado = false;
+
+  void setIsSelected(bool selected, int pos) {
+    products[pos].setIsSelected(selected);
+    notifyListeners();
+  }
 
   void initProduct(Future<List<Product>> productInit) async {
     products = await productInit;
@@ -19,15 +24,16 @@ class ProductProvider with ChangeNotifier {
   }
 
   int idNomProduct(String nameProduct) {
+    int id = 0;
     for (var item in products) {
       if (item.productName == nameProduct) {
-        idProductSelected = item.id;
+        id = item.id;
       }
     }
-    return idProductSelected;
+    return id;
   }
 
-  String NomProductdadoId(int id) {
+  String nomProductdadoId(int id) {
     String result = '';
     for (var item in products) {
       if (item.id == id) {

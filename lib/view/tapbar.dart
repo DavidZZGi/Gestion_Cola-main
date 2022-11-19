@@ -1,23 +1,23 @@
-import 'package:anim_search_bar/anim_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:line_management/model/Product.dart';
 import 'package:line_management/model/municipio.dart';
 import 'package:line_management/model/productos-colas.dart';
-import 'package:line_management/provider/GestionadorProvider.dart';
+
+import 'package:line_management/provider/clientesColasActivasProvider.dart';
 import 'package:line_management/provider/colasActivasProvider.dart';
 
 import 'package:line_management/provider/lineProvider.dart';
 import 'package:line_management/provider/munprovider.dart';
 import 'package:line_management/provider/productProvider.dart';
 import 'package:line_management/provider/productosColasProvider.dart';
-import 'package:line_management/provider/shopProvider.dart';
-import 'package:line_management/view/shopDropdown.dart';
+
+import 'package:line_management/view/productsSelected.dart';
+
 import 'package:provider/provider.dart';
 import '../model/shop.dart';
 import '../provider/connectionProvider.dart';
 import 'listviewcomponent.dart';
-import 'mundropdown.dart';
 
 class MyTapBar extends StatefulWidget {
   const MyTapBar({Key? key}) : super(key: key);
@@ -31,10 +31,12 @@ class _MyTapBarState extends State<MyTapBar> {
   bool tiendaSelected = false;
   late Future<List<Municipio>> municipios;
   late Future<List<Shop>> shops;
+  late Future<String> fecha;
+  late int posActiva;
+  bool creoCola = false;
   //late Future<List> shops;
   @override
   Widget build(BuildContext context) {
-    bool creoCola = false;
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -42,7 +44,14 @@ class _MyTapBarState extends State<MyTapBar> {
           elevation: 0.0,
           backgroundColor: Color.fromARGB(185, 58, 112, 128),
           //shadowColor: Colors.grey,
-          title: Text('Colas Activas'),
+          title: FutureBuilder<String>(
+            future: fecha,
+            builder: (context, snapshot) {
+              Provider.of<ColasActivasProvider>(context, listen: false)
+                  .setFecha(snapshot.data);
+              return Text('${snapshot.data}');
+            },
+          ),
 
           bottom: TabBar(
             indicatorWeight: 8.0,
@@ -183,14 +192,65 @@ class _MyTapBarState extends State<MyTapBar> {
                                   value.colas.remove(value.colas[index]);
                                 });
                               },
-                              child: Card(
-                                color: Colors.lightBlue,
-                                child: ListTile(
-                                  leading:
-                                      Icon(Icons.person_add_disabled_rounded),
-                                  title: Text('${value.colas[index].fecha}'),
-                                  subtitle: Text(
-                                      '${Provider.of<LineProvider>(context, listen: false).nombresTienda[index + 1]}'),
+                              child: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    Provider.of<ClienteColaActivaProvider>(
+                                            context,
+                                            listen: false)
+                                        .develverClientesDadoIdColaSubList(
+                                            value.colas[index].id);
+
+                                    int posColaActiva =
+                                        Provider.of<ColasActivasProvider>(
+                                                context,
+                                                listen: false)
+                                            .colas
+                                            .length;
+
+                                    for (int i = 0;
+                                        i <
+                                            Provider.of<ColasActivasProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .colas
+                                                .length;
+                                        i++) {
+                                      if (Provider.of<ColasActivasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .colas
+                                              .elementAt(i)
+                                              .isSelected ==
+                                          true) {
+                                        Provider.of<ColasActivasProvider>(
+                                                context,
+                                                listen: false)
+                                            .colas
+                                            .elementAt(i)
+                                            .setIsSelected(false);
+                                      }
+                                    }
+
+                                    value.colas[index].setIsSelected(true);
+                                    Provider.of<ColasActivasProvider>(context,
+                                            listen: false)
+                                        .setPosColaActiva(index);
+                                  });
+                                },
+                                child: Card(
+                                  color: Colors.lightBlue,
+                                  child: ListTile(
+                                    leading: Icon(
+                                      Icons.person_add_disabled_rounded,
+                                      color: value.colas[index].isSelected
+                                          ? Colors.green
+                                          : Colors.grey,
+                                    ),
+                                    title: Text('${value.colas[index].id}'),
+                                    subtitle: Text(
+                                        '${Provider.of<LineProvider>(context, listen: false).nombresTienda[index]}'),
+                                  ),
                                 ),
                               ),
                             );
@@ -203,32 +263,67 @@ class _MyTapBarState extends State<MyTapBar> {
               ),
             ),
             //Second Tab item
-            Home(),
+
+            Consumer<LineProvider>(
+              builder: (context, value, child) {
+                if (value.colaCreada) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(child: ProductSelected()),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            child: Icon(Icons.add),
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(60, 60),
+                              shape: const CircleBorder(),
+                            ),
+                            onPressed: value.colaCreada
+                                ? () {
+                                    Navigator.of(context)
+                                        .pushNamed('/productsearch');
+                                  }
+                                : null),
+                      ),
+                    ],
+                  );
+                } else
+                  return Container();
+              },
+            ),
 
             //Third tab item
-            Column(children: [
-              Flexible(
-                child: Consumer<LineProvider>(
-                  builder: (context, value, child) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ElevatedButton(
-                          child: Icon(Icons.add),
-                          style: ElevatedButton.styleFrom(
-                            fixedSize: const Size(60, 60),
-                            shape: const CircleBorder(),
-                          ),
-                          onPressed: value.colaCreada
-                              ? () {
-                                  Navigator.of(context).pushNamed('/lineform');
-                                }
-                              : null),
-                    );
-                  },
-                ),
-              ),
-              Flexible(child: MylistView()),
-            ]),
+            Consumer<LineProvider>(
+              builder: (context, value, child) {
+                if (value.colaCreada) {
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Flexible(child: MylistView()),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ElevatedButton(
+                            child: Icon(Icons.add),
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: const Size(60, 60),
+                              shape: const CircleBorder(),
+                            ),
+                            onPressed: value.colaCreada
+                                ? () {
+                                    Navigator.of(context)
+                                        .pushNamed('/lineform');
+                                  }
+                                : null),
+                      ),
+                    ],
+                  );
+                } else
+                  return Container();
+              },
+            ),
           ],
         ),
       ),
@@ -367,7 +462,11 @@ class _MyTapBarState extends State<MyTapBar> {
         .initMunicipios(municipios);
     shops =
         Provider.of<ConnectionProvider>(context, listen: false).getAllShops();
-    initializeDateFormatting();
+
+    fecha =
+        Provider.of<ColasActivasProvider>(context, listen: false).getFecha();
+    posActiva =
+        Provider.of<ColasActivasProvider>(context, listen: false).posColaActiva;
   }
 }
 
@@ -378,24 +477,154 @@ class ProductSearchBar extends StatefulWidget {
 }
 
 class _ProductSearchBarState extends State<ProductSearchBar> {
-  TextEditingController textController = TextEditingController();
+  late Future<List<Product>> products;
+  List<Product> listAux = [];
+  List<String> nombPred = [];
+  int? posColaActiva;
+  int? idColaActiva;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    products = Provider.of<ConnectionProvider>(context, listen: false)
+        .getAllProducts();
+    listAux = Provider.of<ConnectionProvider>(context, listen: false).products;
+  }
+/*
+  bool actualizarEstadosSeleccionados(int idCola, int index, int idPro) {
+    for (int i = 0;
+        i < Provider.of<ProductosColasProvider>(context).productosCola.length;
+        i++) {
+      if (Provider.of<ProductosColasProvider>(context)
+                  .productosCola[i]
+                  .idCola ==
+              idCola &&
+          Provider.of<ProductosColasProvider>(context)
+                  .productosCola[i]
+                  .idProducto ==
+              idPro) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void initListaNombre() {
+    nombPred = listAux.map((e) => e.productName).toList();
+  }
+  */
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(8, 0, 0, 180),
-      child: Container(
-        child: AnimSearchBar(
-          helpText: 'Buscar',
-          width: 400,
-          textController: textController,
-          onSuffixTap: () {
-            setState(() {
-              textController.clear();
-            });
-          },
-        ),
+    /*
+    if (Provider.of<LineProvider>(context).colaCreada) {
+      posColaActiva = Provider.of<ColasActivasProvider>(context, listen: false)
+          .posColaActiva;
+      idColaActiva = Provider.of<ColasActivasProvider>(context, listen: false)
+          .colas[posColaActiva!]
+          .id;
+    }
+    */
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Seleccione los productos'),
       ),
+      body: FutureBuilder<List>(
+          future: products,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length, //nombPred.length
+                itemBuilder: (context, index) {
+                  return Flexible(
+                    child: ListTile(
+                      title: Padding(
+                        padding: const EdgeInsets.all(3.0),
+                        child: Card(
+                          elevation: 5.0,
+                          color: Color.fromARGB(255, 49, 138, 179),
+                          child: Padding(
+                            padding: const EdgeInsets.all(3.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '${snapshot.data![index].productName}',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: CheckboxListTile(
+                                      value: snapshot.data![index].isSelected,
+                                      onChanged: (bool? newvalue) {
+                                        setState(() {
+                                          snapshot.data![index]
+                                              .setIsSelected(newvalue);
+
+                                          ///Setear en producto si esta seleccionado
+                                          Provider.of<ConnectionProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .products[index]
+                                              .setIsSelected(newvalue);
+                                          print(newvalue);
+
+                                          ///Setear en producto cola
+                                          int posColaActiva =
+                                              Provider.of<ColasActivasProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .posColaActiva;
+
+                                          int idProd = Provider.of<
+                                                      ConnectionProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .idNomShop(
+                                                  '${snapshot.data![index].productName}');
+
+                                          ProductosColas productoElegidos =
+                                              ProductosColas(
+                                                  idCola: Provider.of<
+                                                              ColasActivasProvider>(
+                                                          context,
+                                                          listen: false)
+                                                      .colas[posColaActiva]
+                                                      .id,
+                                                  idProducto:
+                                                      snapshot.data![index].id);
+                                          productoElegidos.setnombreProducto(
+                                              snapshot
+                                                  .data![index].productName);
+                                          Provider.of<ProductosColasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .productosCola
+                                              .add(productoElegidos);
+
+                                          ///Posicion
+
+                                          print(productoElegidos.idCola);
+                                          print(productoElegidos.idProducto);
+                                        });
+                                      }),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            } else
+              return CircularProgressIndicator();
+          }),
     );
   }
 }
@@ -482,7 +711,6 @@ class _HomeState extends State<Home> {
                   .length, //products.length,
 
               itemBuilder: (BuildContext context, int index) {
-                print(value.develverProductosDadoIdCola(idCola).length);
                 return Card(
                   color: Colors.lightBlue[100],
                   elevation: 5.0,
@@ -492,7 +720,7 @@ class _HomeState extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${Provider.of<ProductProvider>(context, listen: false).NomProductdadoId(value.productosCola[index].idProducto)}',
+                          '${Provider.of<ProductProvider>(context, listen: false).nomProductdadoId(value.productosCola[index].idProducto)}',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,

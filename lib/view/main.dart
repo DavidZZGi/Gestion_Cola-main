@@ -13,6 +13,7 @@ import 'package:line_management/provider/shopProvider.dart';
 import 'package:line_management/services/localConnectionServices.dart';
 import 'package:line_management/view/createLineView.dart';
 import 'package:line_management/view/loading.dart';
+import 'package:line_management/view/productsSelected.dart';
 import 'package:line_management/view/shopSelector.dart';
 import 'package:line_management/view/subCola.dart';
 import 'package:provider/provider.dart';
@@ -37,16 +38,6 @@ void main() {
       ChangeNotifierProvider(create: (context) => GestionadorProvider()),
     ],
     child: MaterialApp(
-      supportedLocales: [
-        Locale('de'),
-        Locale('en'),
-        Locale('es'),
-        Locale('fr'),
-        Locale('it'),
-      ],
-      localizationsDelegates: [
-        FormBuilderLocalizations.delegate,
-      ],
       initialRoute: '/loading',
       routes: {
         '/loading': (context) => LoadingPage(),
@@ -55,7 +46,8 @@ void main() {
         '/lineform': (context) => Lineform(),
         '/shopselector': (context) => ShopSelector(),
         '/subcola': ((context) => SubCola()),
-        '/createline': ((context) => CreateLineWidget())
+        '/createline': ((context) => CreateLineWidget()),
+        '/productsearch': ((context) => ProductSearchBar())
       },
       debugShowCheckedModeBanner: false,
     ),

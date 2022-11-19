@@ -1,5 +1,3 @@
-import 'package:line_management/model/estados.dart';
-
 class Cliente {
   // int idCliente;
   String nombre;

@@ -4,10 +4,9 @@ import 'package:line_management/provider/connectionProvider.dart';
 import 'package:line_management/provider/lineProvider.dart';
 import 'package:line_management/provider/productProvider.dart';
 import 'package:line_management/provider/productosColasProvider.dart';
-import 'package:line_management/provider/shopProvider.dart';
 
 import '../model/cliente-colas-activas.dart';
-import '../model/colas-activas.dart';
+
 import '../model/productos-colas.dart';
 
 class GestionadorProvider with ChangeNotifier {
@@ -22,7 +21,7 @@ class GestionadorProvider with ChangeNotifier {
         productosColasProvider.develverProductosDadoIdCola(idCola);
     List<String> nombreProductos = [];
     for (var element in productos) {
-      nombreProductos.add(productProvider.NomProductdadoId(element.idProducto));
+      nombreProductos.add(productProvider.nomProductdadoId(element.idProducto));
     }
 
     String nombTienda = lineProvider.nomTienda;

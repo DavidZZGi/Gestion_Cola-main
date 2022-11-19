@@ -111,44 +111,48 @@ class _LineformState extends State<Lineform> {
                 child: ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.saveAndValidate()) {
-                        int cantColasCreadas =
-                            Provider.of<ColasActivasProvider>(context,
-                                    listen: false)
-                                .colas
-                                .length;
-                        ClienteColasActivas cliente = ClienteColasActivas(
-                            ci: _ciTextController.text,
-                            fv: '',
-                            fechaRegistro: DateTime.now(),
-                            fechaModificacion: DateTime.now(),
-                            idEstado: Estados.estados[0].id,
-                            idCola: Provider.of<ColasActivasProvider>(context,
-                                    listen: false)
-                                .colas[cantColasCreadas - 1]
-                                .id,
-                            nombre: _nameTextController.text +
-                                _apellidotextController.text,
-                            idMunicipio: Provider.of<MunicipioProvider>(context,
-                                    listen: false)
-                                .idActive);
-                        Provider.of<ClienteColaActivaProvider>(context,
-                                listen: false)
-                            .clienteColasActivas
-                            .add(cliente);
-                        print(cliente.idCola);
-                        print(cliente.ci);
-                        print(cliente.nombre);
-                        print(cliente.idEstado);
-                        print(cliente.fechaRegistro);
-                        print(cliente.idMunicipio);
-                        Provider.of<LineProvider>(context, listen: false)
-                            .clientes
-                            .add(Cliente(
-                              carnetIdentidad: _ciTextController.text,
-                              nombre: _nameTextController.text,
-                              apellidos: _apellidotextController.text,
-                              idEstado: 1,
-                            ));
+                        setState(() {
+                          //ACTUALIZAR POSICION DE COLA ACTIVA
+                          int posactiva = Provider.of<ColasActivasProvider>(
+                                  context,
+                                  listen: false)
+                              .posColaActiva;
+                          //OBTENER CANT DE COLAS ACTIVAS
+                          int cantColasCreadas =
+                              Provider.of<ColasActivasProvider>(context,
+                                      listen: false)
+                                  .colas
+                                  .length;
+                          //CREAR CLIENTE
+                          ClienteColasActivas cliente = ClienteColasActivas(
+                              ci: _ciTextController.text,
+                              fv: '',
+                              fechaRegistro: DateTime.now(),
+                              fechaModificacion: DateTime.now(),
+                              idEstado: Estados.estados[0].id,
+                              idCola: Provider.of<ColasActivasProvider>(context,
+                                      listen: false)
+                                  .colas[posactiva]
+                                  .id,
+                              nombre: _nameTextController.text +
+                                  _apellidotextController.text,
+                              idMunicipio: Provider.of<MunicipioProvider>(
+                                      context,
+                                      listen: false)
+                                  .idActive);
+                          //ANADIR A LA LISTA
+                          Provider.of<ClienteColaActivaProvider>(context,
+                                  listen: false)
+                              .addClienteColaActiva(cliente);
+
+                          /* print(cliente.idCola);
+                          print(cliente.ci);
+                          print(cliente.nombre);
+                          print(cliente.idEstado);
+                          print(cliente.fechaRegistro);
+                          print(cliente.idMunicipio);
+                          */
+                        });
 
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             content: Text('Cliente insertado en la cola')));
@@ -229,11 +233,26 @@ class _QRViewExampleState extends State<QRViewExample> {
   @override
   Widget build(BuildContext context) {
     if (result != null && info) {
-      cliente = Provider.of<ClienteProvider>(context, listen: false)
-          .stringToCliente(result!.code!.toLowerCase());
-      Provider.of<ClienteProvider>(context, listen: false).addCliente(cliente);
-
-      print(cliente);
+      //ACTUALIZAR POSICION DE COLA ACTIVA
+      int posactiva = Provider.of<ColasActivasProvider>(context, listen: false)
+          .posColaActiva;
+      List<String> datos =
+          Provider.of<ClienteColaActivaProvider>(context, listen: false)
+              .getQRCode(result!.code!.toLowerCase());
+      ClienteColasActivas cliente = ClienteColasActivas(
+          ci: datos[1],
+          fv: datos[2],
+          fechaRegistro: DateTime.now(),
+          fechaModificacion: DateTime.now(),
+          idEstado: Estados.estados[0].id,
+          idCola: Provider.of<ColasActivasProvider>(context, listen: false)
+              .colas[posactiva]
+              .id,
+          nombre: datos[0],
+          idMunicipio:
+              Provider.of<MunicipioProvider>(context, listen: false).idActive);
+      Provider.of<ClienteColaActivaProvider>(context, listen: false)
+          .addClienteColaActiva(cliente);
       info = false;
     }
     return Scaffold(

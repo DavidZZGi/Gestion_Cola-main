@@ -81,4 +81,33 @@ class ConnectionProvider with ChangeNotifier {
     }
     return 0;
   }
+
+  String nomShopId(int id) {
+    for (var item in shops) {
+      if (item.id == id) {
+        return item.name;
+      }
+    }
+    return '';
+  }
+
+  int idNomProduct(String nameProduct) {
+    int id = 0;
+    for (var item in products) {
+      if (item.productName == nameProduct) {
+        id = item.id;
+      }
+    }
+    return id;
+  }
+
+  String nomProductdadoId(int id) {
+    String result = '';
+    for (var item in products) {
+      if (item.id == id) {
+        result = item.productName;
+      }
+    }
+    return result;
+  }
 }

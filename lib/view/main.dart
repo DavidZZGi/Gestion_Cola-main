@@ -37,11 +37,11 @@ void main() {
     ],
     child: MaterialApp(
       supportedLocales: [
-        Locale('de'),
+        // Locale('de'),
         Locale('en'),
-        Locale('es'),
-        Locale('fr'),
-        Locale('it'),
+        //  Locale('es'),
+        //  Locale('fr'),
+        //  Locale('it'),
       ],
       localizationsDelegates: [
         FormBuilderLocalizations.delegate,

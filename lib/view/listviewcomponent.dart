@@ -88,71 +88,65 @@ class _MylistViewState extends State<MylistView> {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Flexible(
-                          child: Text(
-                            '${clientes[i].nombre}',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black45,
-                                fontSize: 18.0),
-                          ),
+                        Text(
+                          '${clientes[i].nombre}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black45,
+                              fontSize: 18.0),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(3.0),
-                          child: Flexible(
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                  backgroundColor:
-                                      MaterialStateColor.resolveWith((states) =>
-                                          Color.fromARGB(255, 67, 65, 65))),
-                              onPressed: (() {
-                                setState(() {
-                                  int idnewEstado = 1;
-                                  if (clientes[i].idEstado == 4) {
-                                    clientes[i].idEstado = 0;
-                                    idnewEstado = clientes[i].idEstado;
-                                  }
-                                  clientes[i].idEstado++;
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor: MaterialStateColor.resolveWith(
+                                    (states) =>
+                                        Color.fromARGB(255, 67, 65, 65))),
+                            onPressed: (() {
+                              setState(() {
+                                int idnewEstado = 1;
+                                if (clientes[i].idEstado == 4) {
+                                  clientes[i].idEstado = 0;
                                   idnewEstado = clientes[i].idEstado;
-                                  int pos = Provider.of<
-                                              ClienteColaActivaProvider>(
-                                          context,
-                                          listen: false)
-                                      .clienteColasActivas
-                                      .indexWhere((element) => Provider.of<
-                                                  ClienteColaActivaProvider>(
-                                              context,
-                                              listen: false)
-                                          .clienteColasActivas
-                                          .contains(clientes[i]));
-                                  Provider.of<ClienteColaActivaProvider>(
-                                          context,
-                                          listen: false)
-                                      .clienteColasActivas[pos]
-                                      .setIdEstado(idnewEstado);
-                                  print(Provider.of<ClienteColaActivaProvider>(
-                                          context,
-                                          listen: false)
-                                      .clienteColasActivas[pos]
-                                      .idEstado);
-                                });
-                              }),
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                                    child: Text('Estado'),
+                                }
+                                clientes[i].idEstado++;
+                                idnewEstado = clientes[i].idEstado;
+                                int pos = Provider.of<
+                                            ClienteColaActivaProvider>(context,
+                                        listen: false)
+                                    .clienteColasActivas
+                                    .indexWhere((element) =>
+                                        Provider.of<ClienteColaActivaProvider>(
+                                                context,
+                                                listen: false)
+                                            .clienteColasActivas
+                                            .contains(clientes[i]));
+                                Provider.of<ClienteColaActivaProvider>(context,
+                                        listen: false)
+                                    .clienteColasActivas[pos]
+                                    .setIdEstado(idnewEstado);
+                                print(Provider.of<ClienteColaActivaProvider>(
+                                        context,
+                                        listen: false)
+                                    .clienteColasActivas[pos]
+                                    .idEstado);
+                              });
+                            }),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                  child: Text('Estado'),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Flexible(
+                                    child: Text(
+                                        '${Estados.getEstadoName(clientes[i].idEstado)}'),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 5),
-                                    child: Flexible(
-                                      child: Text(
-                                          '${Estados.getEstadoName(clientes[i].idEstado)}'),
-                                    ),
-                                  )
-                                ],
-                              ),
+                                )
+                              ],
                             ),
                           ),
                         )

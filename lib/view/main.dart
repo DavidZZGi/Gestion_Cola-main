@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:line_management/model/ShopSearcher.dart';
+import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:line_management/provider/GestionadorProvider.dart';
 import 'package:line_management/provider/clientProvider.dart';
 import 'package:line_management/provider/clientesColasActivasProvider.dart';
@@ -13,7 +13,6 @@ import 'package:line_management/provider/shopProvider.dart';
 import 'package:line_management/services/localConnectionServices.dart';
 import 'package:line_management/view/createLineView.dart';
 import 'package:line_management/view/loading.dart';
-import 'package:line_management/view/productsSelected.dart';
 import 'package:line_management/view/shopSelector.dart';
 import 'package:line_management/view/subCola.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +20,6 @@ import './upscreen_part.dart';
 import './tapbar.dart';
 import 'lineform.dart';
 import 'loggin.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -38,6 +36,16 @@ void main() {
       ChangeNotifierProvider(create: (context) => GestionadorProvider()),
     ],
     child: MaterialApp(
+      supportedLocales: [
+        Locale('de'),
+        Locale('en'),
+        Locale('es'),
+        Locale('fr'),
+        Locale('it'),
+      ],
+      localizationsDelegates: [
+        FormBuilderLocalizations.delegate,
+      ],
       initialRoute: '/loading',
       routes: {
         '/loading': (context) => LoadingPage(),
@@ -71,12 +79,6 @@ print(path);
   @override
   void initState() {
     super.initState();
-    //Provider.of<ConnectionProvider>(context, listen: false).getConnection();
-
-//Provider.of<ClienteProvider>(context,listen: false).inicializarClientesSinConexion();
-
-    //Provider.of<ShopProvider>(context, listen: false).initShopList;
-    //    Provider.of<ConnectionProvider>(context, listen: false).getAllShops();
   }
 
   @override

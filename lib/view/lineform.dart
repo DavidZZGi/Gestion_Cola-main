@@ -234,6 +234,7 @@ class _QRViewExampleState extends State<QRViewExample> {
   Widget build(BuildContext context) {
     if (result != null && info) {
       //ACTUALIZAR POSICION DE COLA ACTIVA
+      /*
       int posactiva = Provider.of<ColasActivasProvider>(context, listen: false)
           .posColaActiva;
       List<String> datos =
@@ -253,6 +254,7 @@ class _QRViewExampleState extends State<QRViewExample> {
               Provider.of<MunicipioProvider>(context, listen: false).idActive);
       Provider.of<ClienteColaActivaProvider>(context, listen: false)
           .addClienteColaActiva(cliente);
+          */
       info = false;
     }
     return Scaffold(

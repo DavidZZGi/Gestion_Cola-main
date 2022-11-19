@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:line_management/model/line.dart';
+import 'package:line_management/provider/clientesColasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:line_management/provider/shopProvider.dart';
 import 'package:provider/provider.dart';
@@ -108,21 +109,27 @@ class UpScreenPart extends StatelessWidget {
                             color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                 ),
-                Flexible(
-                  child: ElevatedButton(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/subcola');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      fixedSize: const Size(60, 60),
-                      shape: const CircleBorder(),
-                    ),
-                  ),
-                ),
+                Consumer<LineProvider>(
+                  builder: (context, value, child) {
+                    return Flexible(
+                      child: ElevatedButton(
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.white,
+                        ),
+                        onPressed: value.colaCreada
+                            ? () {
+                                Navigator.of(context).pushNamed('/subcola');
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          fixedSize: const Size(60, 60),
+                          shape: const CircleBorder(),
+                        ),
+                      ),
+                    );
+                  },
+                )
               ],
             ),
           ],

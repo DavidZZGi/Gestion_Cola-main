@@ -32,4 +32,9 @@ class ProductosColasProvider with ChangeNotifier {
     productosCola.remove(product);
     notifyListeners();
   }
+
+  void addProductoCola(ProductosColas product) {
+    productosCola.remove(product);
+    notifyListeners();
+  }
 }

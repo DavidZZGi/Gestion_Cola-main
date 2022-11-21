@@ -7,7 +7,7 @@ class ClienteColaActivaProvider with ChangeNotifier {
   List<ClienteColasActivas> clienteColasActivas = [];
   List<ClienteColasActivas> clienteColasActivasDeUnaColaAux = [];
 
-  Future<void> insertAllproductosCola() async {
+  Future<void> insertAllClienteColaActiva() async {
     if (ConnectionProvider.isConnected) {
       await ConnectionProvider.connection
           .insertAllClienteColaActiva(clienteColasActivas);
@@ -22,7 +22,6 @@ class ClienteColaActivaProvider with ChangeNotifier {
         list.add(clienteColasActivas.elementAt(i));
       }
     }
-
     return list;
   }
 
@@ -35,6 +34,7 @@ class ClienteColaActivaProvider with ChangeNotifier {
   }
 
   void addClienteColaActiva(ClienteColasActivas cliente) {
+    //if (!clienteColasActivas.any((element) => element.ci == cliente.ci))
     clienteColasActivas.add(cliente);
     notifyListeners();
   }

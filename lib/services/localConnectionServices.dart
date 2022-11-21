@@ -13,6 +13,8 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'dart:async';
 
+import '../model/ClienteValidator.dart';
+import '../model/cliente-cola-historico.dart';
 import '../model/cliente-colas-activas.dart';
 import '../model/colas-activas.dart';
 import '../model/estados.dart';
@@ -89,11 +91,11 @@ return database;
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "estados_personas" ("id"	INTEGER,"nombre" TEXT);');
     await db.execute(
-        'CREATE TABLE IF NOT EXISTS "clientes-colas-activas" ("ci"	NVARCHAR(11) NOT NULL,"fv"	NVARCHAR(9),"nombre"	NVARCHAR(50) ,"id_municipio"	INTEGER NOT NULL DEFAULT 0,"fecha_registro"	DATETIME NOT NULL,"fecha_modif"	DATETIME,"id_estado"	INTEGER NOT NULL DEFAULT 1,"id_cola"	INTEGER NOT NULL,PRIMARY KEY("ci","id_cola"));');
+        'CREATE TABLE IF NOT EXISTS "clientes_colas_activas" ("ci"	NVARCHAR(11) NOT NULL,"fv"	NVARCHAR(9),"nombre"	NVARCHAR(50) ,"id_municipio"	INTEGER NOT NULL DEFAULT 0,"fecha_registro"	DATETIME NOT NULL,"fecha_modif"	DATETIME,"id_estado"	INTEGER NOT NULL DEFAULT 1,"id_cola"	INTEGER NOT NULL,PRIMARY KEY("ci","id_cola"));');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "productos_colas" ("id_cola" INTEGER NOT NULL,"id_producto" INTEGER NOT NULL,PRIMARY KEY("id_cola","id_producto"));');
     await db.execute(
-        'CREATE TABLE IF NOT EXISTS "colas-activas" ("id"	INTEGER NOT NULL UNIQUE,"tienda" INTEGER NOT NULL,"fecha"	DATETIME NOT NULL,PRIMARY KEY("id"));');
+        'CREATE TABLE IF NOT EXISTS "colas_activas" ("id"	INTEGER NOT NULL UNIQUE,"tienda" INTEGER NOT NULL,"fecha"	DATETIME NOT NULL,PRIMARY KEY("id"));');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "configuracion" ("fecha_nueva_cola"	DATE,"id_nueva_cola"	INTEGER,"subcola_actual"	INTEGER DEFAULT 0,"mensaje_inicial"	NVARCHAR(250),"CI_usuario"	NVARCHAR(11),"Nombre_usuario"	NVARCHAR(50),"telefono_usuario"	NVARCHAR(8),"id_tienda"	INTEGER);');
   }
@@ -112,13 +114,31 @@ return database;
     }
   }
 
-  Future<List<ColaActiva>> getAllClientesColasActivas() async {
-    if (_db != null) {
+  //Get colas Historicas
+  Future<List<ClienteColasHistorico>> getAllClientesColasHistoricas() async {
+    if (_dbcargada != null) {
       final List<Map<String, dynamic>> colasActivas =
-          await _db!.query('colas-activas', distinct: true);
+          await _dbcargada!.rawQuery('SELECT * FROM clientes_colas_historicas');
       return List.generate(colasActivas.length, (i) {
         print(colasActivas[i]);
-        return ColaActiva(
+        return ClienteColasHistorico(
+            idCola: colasActivas[i]['id_cola'],
+            ci: colasActivas[i]['ci'],
+            idMensaje: colasActivas[i]['id_mensaje'],
+            idEstado: colasActivas[i]['id_estado']);
+      });
+    } else
+      return [];
+  }
+
+/*
+  Future<List<ClienteColasActivas>> getAllClientesColasActivas() async {
+    if (_db != null) {
+      final List<Map<String, dynamic>> colasActivas =
+          await _db!.query('clientes-colas-activas', distinct: true);
+      return List.generate(colasActivas.length, (i) {
+        print(colasActivas[i]);
+        return ClienteColasActivas(
             id: colasActivas[i]['id'],
             fecha: colasActivas[i]['fecha'],
             idTienda: colasActivas[i]['idTienda']);
@@ -126,7 +146,7 @@ return database;
     } else
       return [];
   }
-
+*/
   //Crud Colas-Activas
   Future<void> insertColaActiva(ColaActiva cola) async {
     if (_db != null) {
@@ -170,7 +190,7 @@ return database;
   }
 
   Future<List<ProductosColas>> getAllProductosColas() async {
-    if (_db != null) {
+    if (_dbcargada != null) {
       final List<Map<String, dynamic>> productosCola =
           await _db!.query('productos_colas', distinct: true);
       return List.generate(productosCola.length, (i) {
@@ -179,6 +199,25 @@ return database;
           idCola: productosCola[i]['idCola'],
           idProducto: productosCola[i]['idProducto'],
         );
+      });
+    } else
+      return [];
+  }
+
+  ///Servicio para devolver datos cuando se encuentra un cliente
+  Future<List<ClienteValidator>> getAllValidatorData() async {
+    if (_dbcargada != null) {
+      final List<
+          Map<String,
+              dynamic>> productosCola = await _dbcargada!.rawQuery(
+          'SELECT DISTINCT clientes_colas_historicas.id_estado, clientes_colas_historicas.ci, clientes_colas_historicas.id_cola, productos.nombre FROM clientes_colas_historicas INNER JOIN productos_colas INNER JOIN productos WHERE clientes_colas_historicas.id_cola=productos_colas.id_cola AND productos.id=productos_colas.id_producto');
+      return List.generate(productosCola.length, (i) {
+        print(productosCola[i]);
+        return ClienteValidator(
+            idCola: productosCola[i]['id_cola'],
+            nombProducto: productosCola[i]['nombre'],
+            idEstado: productosCola[i]['id_estado'],
+            ci: productosCola[i]['ci']);
       });
     } else
       return [];
@@ -267,11 +306,9 @@ return database;
     if (_db != null) {
       final db = _db!;
 
-      // Query the table for all The Dogs.
       final List<Map<String, dynamic>> maps =
           await db.query('cola', distinct: true);
 
-      // Convert the List<Map<String, dynamic> into a List<Dog>.
       return List.generate(maps.length, (i) {
         List<Cliente> clientes =
             getClientesDadoId(maps[i]['id_cliente']) as List<Cliente>;

@@ -1,20 +1,32 @@
 import 'package:flutter/cupertino.dart';
+import 'package:line_management/model/ClienteValidator.dart';
 import 'package:line_management/provider/colasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:line_management/provider/lineProvider.dart';
 import 'package:line_management/provider/productProvider.dart';
 import 'package:line_management/provider/productosColasProvider.dart';
 
+import '../model/cliente-cola-historico.dart';
 import '../model/cliente-colas-activas.dart';
 
 import '../model/productos-colas.dart';
 
 class GestionadorProvider with ChangeNotifier {
-  List<ClienteColasActivas> clienteColas = [];
+  List<ClienteValidator> clienteValidator = [];
+  List<ClienteColasHistorico> clienteColasHistoricas = [];
+  List<ProductosColas> productosColasHistorica = [];
   ProductosColasProvider productosColasProvider = ProductosColasProvider();
   ColasActivasProvider colasActivasProvider = ColasActivasProvider();
   ProductProvider productProvider = ProductProvider();
   LineProvider lineProvider = LineProvider();
+
+  ///Cargar datos de la bd historica
+  Future<void> cargarAllValidatorData() async {
+    if (ConnectionProvider.isConnected) {
+      clienteValidator =
+          await ConnectionProvider.connection.getAllValidatorData();
+    }
+  }
 
   String obtenerNombreTiendaYProductDeTiendaActia(int idCola) {
     List<ProductosColas> productos =
@@ -39,30 +51,5 @@ class GestionadorProvider with ChangeNotifier {
     if (ConnectionProvider.isConnected) {
       await ConnectionProvider.connection.getAllColasActivas();
     }
-  }
-
-  Future<void> getAllClientesColaActivas() async {
-    if (ConnectionProvider.isConnected) {
-      await ConnectionProvider.connection.getAllClientesColasActivas();
-    }
-  }
-
-  Future<void> insertAllClienteColasActivas() async {
-    if (ConnectionProvider.isConnected) {
-      await ConnectionProvider.connection
-          .insertAllClienteColaActiva(clienteColas);
-    }
-    notifyListeners();
-  }
-
-  List<ClienteColasActivas> devolverClientesDadoIdCola(int idCola) {
-    List<ClienteColasActivas> clienteDeUnaCola = [];
-    for (var element in clienteColas) {
-      if (element.idCola == idCola) {
-        clienteDeUnaCola.add(element);
-      }
-    }
-    notifyListeners();
-    return clienteDeUnaCola;
   }
 }

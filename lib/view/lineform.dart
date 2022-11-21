@@ -8,6 +8,8 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:line_management/model/client.dart';
 import 'package:line_management/model/cliente-colas-activas.dart';
 import 'package:line_management/model/estados.dart';
+import 'package:line_management/model/shop.dart';
+import 'package:line_management/provider/GestionadorProvider.dart';
 import 'package:line_management/provider/clientProvider.dart';
 import 'package:line_management/provider/clientesColasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
@@ -15,6 +17,7 @@ import 'package:line_management/provider/lineProvider.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import '../model/ClienteValidator.dart';
 import '../provider/colasActivasProvider.dart';
 import '../provider/munprovider.dart';
 
@@ -26,6 +29,7 @@ class Lineform extends StatefulWidget {
 }
 
 class _LineformState extends State<Lineform> {
+  List<ClienteValidator>? clientesVerify;
   final _nameTextController = TextEditingController();
   final _apellidotextController = TextEditingController();
   final _ciTextController = TextEditingController();
@@ -36,6 +40,15 @@ class _LineformState extends State<Lineform> {
     _apellidotextController.dispose();
     _ciTextController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<GestionadorProvider>(context, listen: false)
+        .cargarAllValidatorData();
+    clientesVerify = Provider.of<GestionadorProvider>(context, listen: false)
+        .clienteValidator;
   }
 
   final formKey = GlobalKey<FormBuilderState>();
@@ -140,10 +153,17 @@ class _LineformState extends State<Lineform> {
                                       context,
                                       listen: false)
                                   .idActive);
+
                           //ANADIR A LA LISTA
-                          Provider.of<ClienteColaActivaProvider>(context,
-                                  listen: false)
-                              .addClienteColaActiva(cliente);
+                          if (!clientesVerify!.any((element) =>
+                              element.ci == cliente.ci &&
+                              element.idCola == cliente.idCola))
+                            Provider.of<ClienteColaActivaProvider>(context,
+                                    listen: false)
+                                .addClienteColaActiva(cliente);
+                          else {
+                            _showDialog(cliente);
+                          }
 
                           /* print(cliente.idCola);
                           print(cliente.ci);
@@ -197,7 +217,72 @@ class _LineformState extends State<Lineform> {
       ),
     );
   }
+
+  Widget _buildAlertDialog(ClienteColasActivas cliente) {
+    String productos = '';
+    ClienteValidator? clientereal;
+    for (int i = 0; i < clientesVerify!.length; i++) {
+      if (cliente.ci == clientesVerify!.elementAt(i).ci &&
+          cliente.idCola == clientesVerify!.elementAt(i).idCola) {
+        clientereal = clientesVerify!.elementAt(i);
+        productos += '' + clientesVerify!.elementAt(i).nombProducto + '/';
+      }
+    }
+    print(productos);
+    int idTienda = int.parse(clientereal!.idCola.toString().substring(0, 3));
+    print(idTienda);
+    String nombTiemda =
+        Provider.of<LineProvider>(context, listen: false).nomTienda;
+    String fecha = '2' + clientereal.idCola.toString().substring(3, 8);
+    String fechareal = fecha.substring(0, 2) +
+        '/' +
+        fecha.substring(2, 4) +
+        '/' +
+        fecha.substring(4, 6);
+
+    return AlertDialog(
+      title: Text('Cliente Encontrado en el Sistema'),
+      content: Center(
+        child: Column(
+          children: [
+            Text('CI: ${clientereal.ci}'),
+            Text('Productos: $productos'),
+            Text('Tienda: $nombTiemda'),
+            Text('Fecha: $fechareal'),
+            Text('Estado: ${Estados.getEstadoName(clientereal.idEstado)}')
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+            child: Text("Aceptar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.blue)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+        ElevatedButton(
+            child: Text("Rechazar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.red)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+      ],
+    );
+  }
+
+  void _showDialog(ClienteColasActivas cliente) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return _buildAlertDialog(cliente);
+        });
+  }
 }
+
 //clase para acceder a la camara y poder escanear
 
 class QRViewExample extends StatefulWidget {
@@ -208,6 +293,7 @@ class QRViewExample extends StatefulWidget {
 }
 
 class _QRViewExampleState extends State<QRViewExample> {
+  List<ClienteValidator>? clientesVerify;
   late Cliente cliente;
   bool info = true;
   Barcode? result;
@@ -228,6 +314,18 @@ class _QRViewExampleState extends State<QRViewExample> {
   @override
   void initState() {
     super.initState();
+    Provider.of<GestionadorProvider>(context, listen: false)
+        .cargarAllValidatorData();
+    clientesVerify = Provider.of<GestionadorProvider>(context, listen: false)
+        .clienteValidator;
+  }
+
+  void _showDialog(ClienteColasActivas cliente) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return _buildAlertDialog(cliente);
+        });
   }
 
   @override
@@ -252,8 +350,13 @@ class _QRViewExampleState extends State<QRViewExample> {
           nombre: datos[0],
           idMunicipio:
               Provider.of<MunicipioProvider>(context, listen: false).idActive);
-      Provider.of<ClienteColaActivaProvider>(context, listen: false)
-          .addClienteColaActiva(cliente);
+      if (!clientesVerify!.any((element) =>
+          element.ci == cliente.ci && element.idCola == cliente.idCola))
+        Provider.of<ClienteColaActivaProvider>(context, listen: false)
+            .addClienteColaActiva(cliente);
+      else {
+        _showDialog(cliente);
+      }
 
       info = false;
     }
@@ -392,5 +495,60 @@ class _QRViewExampleState extends State<QRViewExample> {
   void dispose() {
     controller?.dispose();
     super.dispose();
+  }
+
+  Widget _buildAlertDialog(ClienteColasActivas cliente) {
+    String productos = '';
+    ClienteValidator? clientereal;
+    for (int i = 0; i < clientesVerify!.length; i++) {
+      if (cliente.ci == clientesVerify!.elementAt(i).ci &&
+          cliente.idCola == clientesVerify!.elementAt(i).idCola) {
+        clientereal = clientesVerify!.elementAt(i);
+        productos += '' + clientesVerify!.elementAt(i).nombProducto + '/';
+      }
+    }
+    print(productos);
+    int idTienda = int.parse(clientereal!.idCola.toString().substring(0, 3));
+    print(idTienda);
+
+    String fecha = '2' + clientereal.idCola.toString().substring(3, 8);
+    String fechareal = fecha.substring(0, 2) +
+        '/' +
+        fecha.substring(2, 4) +
+        '/' +
+        fecha.substring(4, 6);
+
+    return AlertDialog(
+      title: Text('Cliente Encontrado en el Sistema'),
+      content: Center(
+        child: Column(
+          children: [
+            Text('CI: ${clientereal.ci}'),
+            Text('Productos: $productos'),
+            Text('Tienda: $idTienda'),
+            Text('Fecha: $fechareal'),
+            Text('Estado: ${Estados.getEstadoName(clientereal.idEstado)}')
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+            child: Text("Aceptar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.blue)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+        ElevatedButton(
+            child: Text("Rechazar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.red)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+      ],
+    );
   }
 }

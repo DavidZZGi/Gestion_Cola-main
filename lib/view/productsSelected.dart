@@ -32,13 +32,12 @@ class _ProductSelectedState extends State<ProductSelected> {
   Widget build(BuildContext context) {
     return Consumer<ProductosColasProvider>(
       builder: (context, value, child) {
+        List<ProductosColas> productos =
+            value.develverProductosDadoIdCola(idColaActiva!);
         return ListView.builder(
             padding: EdgeInsets.all(6),
-            itemCount: value.develverProductosDadoIdCola(idColaActiva!).length,
+            itemCount: productos.length,
             itemBuilder: (context, i) {
-              List<ProductosColas> productos =
-                  value.develverProductosDadoIdCola(idColaActiva!);
-
               return Dismissible(
                 background: Container(
                   child: Center(

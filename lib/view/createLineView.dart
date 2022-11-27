@@ -42,7 +42,7 @@ class _CreateLineWidgetState extends State<CreateLineWidget> {
   int checkSiSonColasDeLaMismaTienda(idShop) {
     int counter = 0;
     for (var element in colasCreadas!) {
-      if (element.idTienda == idShop) {
+      if (element.tienda == idShop) {
         counter++;
       }
     }
@@ -113,54 +113,70 @@ class _CreateLineWidgetState extends State<CreateLineWidget> {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               duration: Duration(seconds: 2),
                               content: Text('Cola creada satisfactoriamente')));
-                          creoCola = true;
-                          Provider.of<LineProvider>(context, listen: false)
-                              .setcolaCreada(creoCola);
-                          Provider.of<LineProvider>(context, listen: false)
-                              .clientes
-                              .clear();
-                          //Creando el objeto Cola Activa
-                          int idTienda = Provider.of<ConnectionProvider>(
-                                  context,
-                                  listen: false)
-                              .idNomShop(Provider.of<LineProvider>(context,
-                                      listen: false)
-                                  .nomTienda);
-                          int cantColasCreadas =
-                              Provider.of<ColasActivasProvider>(context,
-                                      listen: false)
-                                  .colas
-                                  .length;
-                          ColaActiva cola = ColaActiva(
-                              id: construirIdCola(fecha),
-                              idTienda: idTienda,
-                              fecha: DateTime.now());
-                          Provider.of<ColasActivasProvider>(context,
-                                  listen: false)
-                              .colas
-                              .add(cola);
-                          Provider.of<ColasActivasProvider>(context,
-                                  listen: false)
-                              .setPosColaActiva(cantColasCreadas);
-                          Provider.of<ColasActivasProvider>(context,
-                                  listen: false)
-                              .colas[cantColasCreadas]
-                              .setcantColasdeUnaTienda(
-                                  checkSiSonColasDeLaMismaTienda(idTienda));
-                          List<ColaActiva> colas =
-                              Provider.of<ColasActivasProvider>(context,
-                                      listen: false)
-                                  .colas;
 
-                          if (cantColasCreadas > 0) {
-                            setState(() {
-                              colas[cantColasCreadas - 1].setIsSelected(false);
-                            });
-                          }
+                          setState(() {
+                            creoCola = true;
+                            Provider.of<LineProvider>(context, listen: false)
+                                .setcolaCreada(creoCola);
+                            Provider.of<LineProvider>(context, listen: false)
+                                .clientes
+                                .clear();
+                            //Creando el objeto Cola Activa
+                            int idTienda = Provider.of<ConnectionProvider>(
+                                    context,
+                                    listen: false)
+                                .idNomShop(Provider.of<LineProvider>(context,
+                                        listen: false)
+                                    .nomTienda);
 
-                          print(cola.id);
-                          print(cola.idTienda);
-                          print(cola.fecha);
+                            ColaActiva cola = ColaActiva(
+                                id: construirIdCola(fecha),
+                                tienda: idTienda,
+                                fecha: DateTime.now().toIso8601String());
+                            cola.nombTienda = Provider.of<LineProvider>(context,
+                                    listen: false)
+                                .nomTienda;
+                            cola.setIsSelected(true);
+                            Provider.of<ColasActivasProvider>(context,
+                                    listen: false)
+                                .addCola(cola);
+                            int cantColasCreadas =
+                                Provider.of<ColasActivasProvider>(context,
+                                        listen: false)
+                                    .colas
+                                    .length;
+                            Provider.of<ColasActivasProvider>(context,
+                                    listen: false)
+                                .setPosColaActiva(cantColasCreadas - 1);
+                            Provider.of<ColasActivasProvider>(context,
+                                    listen: false)
+                                .colas[cantColasCreadas - 1]
+                                .setcantColasdeUnaTienda(
+                                    checkSiSonColasDeLaMismaTienda(idTienda));
+                            List<ColaActiva> colas =
+                                Provider.of<ColasActivasProvider>(context,
+                                        listen: false)
+                                    .colas;
+
+                            if (Provider.of<ColasActivasProvider>(context,
+                                        listen: false)
+                                    .posColaActiva >
+                                0) {
+                              colas[Provider.of<ColasActivasProvider>(context,
+                                              listen: false)
+                                          .posColaActiva -
+                                      1]
+                                  .setIsSelected(false);
+                            }
+
+                            print(cola.id);
+                            print(cola.tienda);
+                            print(cola.fecha);
+                            print(Provider.of<ColasActivasProvider>(context,
+                                    listen: false)
+                                .posColaActiva);
+                            print(cola.isSelected);
+                          });
                         } else if (!munSelected && selectShop) {
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                               duration: Duration(seconds: 2),

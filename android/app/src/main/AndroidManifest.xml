@@ -2,7 +2,7 @@
     package="com.example.line_management">
    <application
         android:label="line_management"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/cubacola">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

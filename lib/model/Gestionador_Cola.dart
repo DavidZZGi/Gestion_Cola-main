@@ -10,7 +10,7 @@ class Gestionador {
   static List<ProductosColas> develverProductosDadoIdCola(int idCola) {
     List<ProductosColas> productosDeUnaCola = [];
     for (var element in productosCola) {
-      if (element.idCola == idCola) {
+      if (element.id_cola == idCola) {
         productosDeUnaCola.add(element);
       }
     }
@@ -20,7 +20,7 @@ class Gestionador {
   static List<ClienteColasActivas> devolverClientesDadoIdCola(int idCola) {
     List<ClienteColasActivas> clienteDeUnaCola = [];
     for (var element in clienteColas) {
-      if (element.idCola == idCola) {
+      if (element.id_cola == idCola) {
         clienteDeUnaCola.add(element);
       }
     }

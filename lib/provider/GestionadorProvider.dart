@@ -33,7 +33,8 @@ class GestionadorProvider with ChangeNotifier {
         productosColasProvider.develverProductosDadoIdCola(idCola);
     List<String> nombreProductos = [];
     for (var element in productos) {
-      nombreProductos.add(productProvider.nomProductdadoId(element.idProducto));
+      nombreProductos
+          .add(productProvider.nomProductdadoId(element.id_producto));
     }
 
     String nombTienda = lineProvider.nomTienda;

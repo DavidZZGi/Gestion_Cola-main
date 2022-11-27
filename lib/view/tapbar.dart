@@ -176,7 +176,7 @@ class _MyTapBarState extends State<MyTapBar> {
                                     ),
                                     title: Text('${value.colas[index].id}'),
                                     subtitle: Text(
-                                        '${Provider.of<LineProvider>(context, listen: false).nombresTienda[index]}'),
+                                        '${value.colas[index].nombTienda}'),
                                   ),
                                 ),
                               ),
@@ -198,7 +198,7 @@ class _MyTapBarState extends State<MyTapBar> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Flexible(child: ProductSelected()),
+                      Expanded(child: ProductSelected()),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
@@ -229,7 +229,7 @@ class _MyTapBarState extends State<MyTapBar> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Flexible(child: MylistView()),
+                      Expanded(child: MylistView()),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
@@ -444,15 +444,6 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
 
   @override
   Widget build(BuildContext context) {
-    /*
-    if (Provider.of<LineProvider>(context).colaCreada) {
-      posColaActiva = Provider.of<ColasActivasProvider>(context, listen: false)
-          .posColaActiva;
-      idColaActiva = Provider.of<ColasActivasProvider>(context, listen: false)
-          .colas[posColaActiva!]
-          .id;
-    }
-    */
     return Scaffold(
       appBar: AppBar(
         title: Text('Seleccione los productos'),
@@ -462,91 +453,143 @@ class _ProductSearchBarState extends State<ProductSearchBar> {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return ListView.builder(
+                shrinkWrap: true,
                 itemCount: snapshot.data!.length, //nombPred.length
                 itemBuilder: (context, index) {
-                  return Flexible(
-                    child: ListTile(
-                      title: Padding(
-                        padding: const EdgeInsets.all(3.0),
-                        child: Card(
-                          elevation: 5.0,
-                          color: Color.fromARGB(255, 49, 138, 179),
-                          child: Padding(
-                            padding: const EdgeInsets.all(3.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  '${snapshot.data![index].productName}',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                Flexible(
-                                  child: CheckboxListTile(
-                                      value: snapshot.data![index].isSelected,
-                                      onChanged: (bool? newvalue) {
-                                        setState(() {
-                                          snapshot.data![index]
-                                              .setIsSelected(newvalue);
-
-                                          ///Setear en producto si esta seleccionado
-                                          Provider.of<ConnectionProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .products[index]
-                                              .setIsSelected(newvalue);
-                                          print(newvalue);
-
-                                          ///Setear en producto cola
-                                          int posColaActiva =
-                                              Provider.of<ColasActivasProvider>(
-                                                      context,
-                                                      listen: false)
-                                                  .posColaActiva;
-
-                                          int idProd = Provider.of<
-                                                      ConnectionProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .idNomShop(
-                                                  '${snapshot.data![index].productName}');
-
-                                          ProductosColas productoElegidos =
-                                              ProductosColas(
-                                                  idCola: Provider.of<
-                                                              ColasActivasProvider>(
-                                                          context,
-                                                          listen: false)
-                                                      .colas[posColaActiva]
-                                                      .id,
-                                                  idProducto:
-                                                      snapshot.data![index].id);
-                                          productoElegidos.setnombreProducto(
-                                              snapshot
-                                                  .data![index].productName);
-                                          Provider.of<ProductosColasProvider>(
-                                                  context,
-                                                  listen: false)
-                                              .productosCola
-                                              .add(productoElegidos);
-
-                                          ///Posicion
-
-                                          print(productoElegidos.idCola);
-                                          print(productoElegidos.idProducto);
-                                        });
-                                      }),
-                                ),
-                              ],
+                  return Padding(
+                    padding: EdgeInsets.all(5),
+                    child: Container(
+                      height: 70,
+                      color: Colors.blue,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child: Icon(
+                              Icons.fastfood,
+                              size: 30,
+                              color: Colors.black,
                             ),
                           ),
-                        ),
+                          Text(
+                            '${snapshot.data![index].productName}',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Flexible(
+                            child: CheckboxListTile(
+                              value: snapshot.data![index].isSelected,
+                              onChanged: (bool? newvalue) {
+                                setState(() {
+                                  snapshot.data![index].setIsSelected(newvalue);
+
+                                  ///Setear en producto si esta seleccionado
+                                  if (newvalue == true) {
+                                    Provider.of<ConnectionProvider>(context,
+                                            listen: false)
+                                        .products[index]
+                                        .setIsSelected(newvalue);
+                                    print(newvalue);
+
+                                    ///Setear en producto cola
+                                    int posColaActiva =
+                                        Provider.of<ColasActivasProvider>(
+                                                context,
+                                                listen: false)
+                                            .posColaActiva;
+
+                                    int idCola =
+                                        Provider.of<ColasActivasProvider>(
+                                                context,
+                                                listen: false)
+                                            .colas[posColaActiva]
+                                            .id;
+                                    ProductosColas productoElegidos =
+                                        ProductosColas(
+                                            id_cola: idCola,
+                                            id_producto:
+                                                snapshot.data![index].id);
+                                    productoElegidos.setnombreProducto(
+                                        snapshot.data![index].productName);
+                                    Provider.of<ProductosColasProvider>(context,
+                                            listen: false)
+                                        .addProductoCola(
+                                            productoElegidos, idCola);
+                                  } else {
+                                    Provider.of<ProductosColasProvider>(context,
+                                            listen: false)
+                                        .removeProductoColaByName(
+                                            snapshot.data![index].productName);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   );
+
+                  /* ListTile(
+                    leading: Icon(
+                      Icons.fastfood,
+                      size: 30,
+                      color: Colors.black,
+                    ),
+                    title: Text(
+                      '${snapshot.data![index].productName}',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    trailing: CheckboxListTile(
+                        value: snapshot.data![index].isSelected,
+                        onChanged: (bool? newvalue) {
+                          setState(() {
+                            snapshot.data![index].setIsSelected(newvalue);
+
+                            ///Setear en producto si esta seleccionado
+                            if (newvalue == true) {
+                              Provider.of<ConnectionProvider>(context,
+                                      listen: false)
+                                  .products[index]
+                                  .setIsSelected(newvalue);
+                              print(newvalue);
+
+                              ///Setear en producto cola
+                              int posColaActiva =
+                                  Provider.of<ColasActivasProvider>(context,
+                                          listen: false)
+                                      .posColaActiva;
+
+                              int idCola = Provider.of<ColasActivasProvider>(
+                                      context,
+                                      listen: false)
+                                  .colas[posColaActiva]
+                                  .id;
+                              ProductosColas productoElegidos = ProductosColas(
+                                  idCola: idCola,
+                                  idProducto: snapshot.data![index].id);
+                              productoElegidos.setnombreProducto(
+                                  snapshot.data![index].productName);
+                              Provider.of<ProductosColasProvider>(context,
+                                      listen: false)
+                                  .addProductoCola(productoElegidos, idCola);
+                            } else {
+                              Provider.of<ProductosColasProvider>(context,
+                                      listen: false)
+                                  .removeProductoColaByName(
+                                      snapshot.data![index].productName);
+                            }
+                          });
+                        }),
+                  );*/
                 },
               );
             } else
@@ -647,7 +690,7 @@ class _HomeState extends State<Home> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${Provider.of<ProductProvider>(context, listen: false).nomProductdadoId(value.productosCola[index].idProducto)}',
+                          '${Provider.of<ProductProvider>(context, listen: false).nomProductdadoId(value.productosCola[index].id_producto)}',
                           style: TextStyle(
                             color: Colors.black,
                             fontSize: 20,
@@ -752,19 +795,19 @@ class _HomeState extends State<Home> {
                                 .idNomProduct('${_filterList[index]}');
 
                             ProductosColas productoElegidos = ProductosColas(
-                                idCola: Provider.of<ColasActivasProvider>(
+                                id_cola: Provider.of<ColasActivasProvider>(
                                         context,
                                         listen: false)
                                     .colas[posColaActiva - 1]
                                     .id,
-                                idProducto: idProd);
+                                id_producto: idProd);
                             Provider.of<ProductosColasProvider>(context,
                                     listen: false)
                                 .productosCola
                                 .add(productoElegidos);
 
-                            print(productoElegidos.idCola);
-                            print(productoElegidos.idProducto);
+                            print(productoElegidos.id_cola);
+                            print(productoElegidos.id_producto);
                           } else
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 duration: Duration(seconds: 2),

@@ -2,16 +2,17 @@ import 'cliente-colas-activas.dart';
 
 class ColaActiva {
   int id;
-  int idTienda;
-  DateTime fecha;
+  int tienda;
+  String fecha;
   bool isSelected = true;
   int cantColasdeUnaTienda = 0;
   List<ClienteColasActivas>? clienteColas;
+  String? nombTienda;
 
-  ColaActiva({required this.id, required this.idTienda, required this.fecha});
+  ColaActiva({required this.id, required this.tienda, required this.fecha});
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'idTienda': idTienda, 'fecha': fecha};
+    return {'id': id, 'tienda': tienda, 'fecha': fecha};
   }
 
   void setId(int id) {
@@ -19,7 +20,7 @@ class ColaActiva {
   }
 
   void setIdTienda(int idTienda) {
-    this.idTienda = idTienda;
+    this.tienda = idTienda;
   }
 
   void setIsSelected(bool selected) {

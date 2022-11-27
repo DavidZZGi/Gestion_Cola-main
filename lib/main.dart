@@ -12,14 +12,14 @@ import 'package:line_management/provider/productosColasProvider.dart';
 import 'package:line_management/provider/shopProvider.dart';
 import 'package:line_management/services/localConnectionServices.dart';
 import 'package:line_management/view/createLineView.dart';
+import 'package:line_management/view/lineform.dart';
 import 'package:line_management/view/loading.dart';
+import 'package:line_management/view/loggin.dart';
 import 'package:line_management/view/shopSelector.dart';
 import 'package:line_management/view/subCola.dart';
+import 'package:line_management/view/tapbar.dart';
+import 'package:line_management/view/upscreen_part.dart';
 import 'package:provider/provider.dart';
-import './upscreen_part.dart';
-import './tapbar.dart';
-import 'lineform.dart';
-import 'loggin.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -55,7 +55,7 @@ void main() {
         '/shopselector': (context) => ShopSelector(),
         '/subcola': ((context) => SubCola()),
         '/createline': ((context) => CreateLineWidget()),
-        '/productsearch': ((context) => ProductSearchBar())
+        '/productsearch': ((context) => ProductSearchBar()),
       },
       debugShowCheckedModeBanner: false,
     ),

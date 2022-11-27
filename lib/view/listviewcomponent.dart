@@ -35,14 +35,13 @@ class _MylistViewState extends State<MylistView> {
   @override
   void initState() {
     super.initState();
-    // Provider.of<ConnectionProvider>(context, listen: false)
-    //     .loadClientesFromDB();
     posCola =
         Provider.of<ColasActivasProvider>(context, listen: false).posColaActiva;
     print(posCola);
     idColaActiva = Provider.of<ColasActivasProvider>(context, listen: false)
         .colas[posCola!]
         .id;
+    print(idColaActiva);
   }
 
   @override
@@ -55,7 +54,6 @@ class _MylistViewState extends State<MylistView> {
             itemBuilder: (context, i) {
               List<ClienteColasActivas> clientes =
                   value.develverClientesDadoIdCola(idColaActiva);
-
               return Dismissible(
                 background: Container(
                   child: Center(
@@ -88,12 +86,14 @@ class _MylistViewState extends State<MylistView> {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '${clientes[i].nombre}',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black45,
-                              fontSize: 18.0),
+                        Flexible(
+                          child: Text(
+                            '${i + 1}.  ${clientes[i].nombre}',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black45,
+                                fontSize: 18.0),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(3.0),
@@ -105,12 +105,12 @@ class _MylistViewState extends State<MylistView> {
                             onPressed: (() {
                               setState(() {
                                 int idnewEstado = 1;
-                                if (clientes[i].idEstado == 4) {
-                                  clientes[i].idEstado = 0;
-                                  idnewEstado = clientes[i].idEstado;
+                                if (clientes[i].id_estado == 4) {
+                                  clientes[i].id_estado = 0;
+                                  idnewEstado = clientes[i].id_estado;
                                 }
-                                clientes[i].idEstado++;
-                                idnewEstado = clientes[i].idEstado;
+                                clientes[i].id_estado++;
+                                idnewEstado = clientes[i].id_estado;
                                 int pos = Provider.of<
                                             ClienteColaActivaProvider>(context,
                                         listen: false)
@@ -129,7 +129,7 @@ class _MylistViewState extends State<MylistView> {
                                         context,
                                         listen: false)
                                     .clienteColasActivas[pos]
-                                    .idEstado);
+                                    .id_estado);
                               });
                             }),
                             child: Column(
@@ -143,7 +143,7 @@ class _MylistViewState extends State<MylistView> {
                                   padding: const EdgeInsets.only(bottom: 5),
                                   child: Flexible(
                                     child: Text(
-                                        '${Estados.getEstadoName(clientes[i].idEstado)}'),
+                                        '${Estados.getEstadoName(clientes[i].id_estado)}'),
                                   ),
                                 )
                               ],
@@ -152,7 +152,7 @@ class _MylistViewState extends State<MylistView> {
                         )
                       ],
                     ),
-                    subtitle: Text('${clientes[i].idCola}'),
+                    subtitle: Text('${clientes[i].id_cola}'),
                   ),
                 ),
               );

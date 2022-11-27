@@ -1,23 +1,23 @@
 class ProductosColas {
-  int idCola;
-  int idProducto;
+  int id_cola;
+  int id_producto;
   bool isSelected = false;
   String? nombreProducto;
-  ProductosColas({required this.idCola, required this.idProducto});
+  ProductosColas({required this.id_cola, required this.id_producto});
 
   Map<String, dynamic> toMap() {
     return {
-      'idCola': idCola,
-      'idProducto': idProducto,
+      'id_cola': id_cola,
+      'id_producto': id_producto,
     };
   }
 
   void setIdCola(int idCola) {
-    this.idCola = idCola;
+    this.id_cola = idCola;
   }
 
   void setIdProducto(int idProducto) {
-    this.idProducto = idProducto;
+    this.id_producto = idProducto;
   }
 
   void setIsSelected(bool selected) {

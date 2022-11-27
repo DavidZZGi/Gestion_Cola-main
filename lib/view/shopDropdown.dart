@@ -73,13 +73,17 @@ class _ShopDropdownState extends State<ShopDropdown> {
                         Provider.of<ShopProvider>(context, listen: false)
                             .setshopSelected(true);
                         Provider.of<LineProvider>(context, listen: false)
-                            .setNomTienda(value);
+                            .setNomTienda(dropDownValue!);
+                        Provider.of<LineProvider>(context, listen: false)
+                            .incNomTiendaPos();
+                        Provider.of<LineProvider>(context, listen: false)
+                            .setNomTiendaActiva(dropDownValue!);
                         Provider.of<ShopProvider>(context, listen: false)
                             .idNomShop(value);
                       });
                     },
-                    value: snapshot.data[shopPos].name),
-              )
+                    value: dropDownValue //snapshot.data[shopPos].name),
+                    ))
             : Container(
                 child: Center(
                   child: Text('Loading...'),

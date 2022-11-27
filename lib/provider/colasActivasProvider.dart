@@ -19,6 +19,21 @@ class ColasActivasProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void addCola(ColaActiva cola) {
+    colas.add(cola);
+    notifyListeners();
+  }
+
+  void setnombTienda(int idCola, String nomTienda) {
+    for (int i = 0; i < colas.length; i++) {
+      if (colas.elementAt(i).id == idCola) {
+        colas.elementAt(i).nombTienda = nomTienda;
+        notifyListeners();
+        break;
+      }
+    }
+  }
+
   Future<String> getFecha() async {
     String result = '';
     if (ConnectionProvider.isConnected) {

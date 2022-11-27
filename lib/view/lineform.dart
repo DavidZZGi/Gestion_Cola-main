@@ -14,6 +14,7 @@ import 'package:line_management/provider/clientProvider.dart';
 import 'package:line_management/provider/clientesColasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
 import 'package:line_management/provider/lineProvider.dart';
+import 'package:line_management/view/QRfinder.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
@@ -137,19 +138,21 @@ class _LineformState extends State<Lineform> {
                                   .colas
                                   .length;
                           //CREAR CLIENTE
+                          int idCola = Provider.of<ColasActivasProvider>(
+                                  context,
+                                  listen: false)
+                              .colas[posactiva]
+                              .id;
                           ClienteColasActivas cliente = ClienteColasActivas(
                               ci: _ciTextController.text,
                               fv: '',
-                              fechaRegistro: DateTime.now(),
-                              fechaModificacion: DateTime.now(),
-                              idEstado: Estados.estados[0].id,
-                              idCola: Provider.of<ColasActivasProvider>(context,
-                                      listen: false)
-                                  .colas[posactiva]
-                                  .id,
+                              fecha_registro: DateTime.now().toIso8601String(),
+                              fecha_modif: DateTime.now().toIso8601String(),
+                              id_estado: Estados.estados[0].id,
+                              id_cola: idCola,
                               nombre: _nameTextController.text +
                                   _apellidotextController.text,
-                              idMunicipio: Provider.of<MunicipioProvider>(
+                              id_municipio: Provider.of<MunicipioProvider>(
                                       context,
                                       listen: false)
                                   .idActive);
@@ -157,28 +160,30 @@ class _LineformState extends State<Lineform> {
                           //ANADIR A LA LISTA
                           if (!clientesVerify!.any((element) =>
                               element.ci == cliente.ci &&
-                              element.idCola == cliente.idCola))
-                            Provider.of<ClienteColaActivaProvider>(context,
+                              element.idCola == cliente.id_cola)) {
+                            if (Provider.of<ClienteColaActivaProvider>(context,
                                     listen: false)
-                                .addClienteColaActiva(cliente);
-                          else {
+                                .addClienteColaActiva(cliente, idCola)) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Cliente registrado en la cola')));
+                              _nameTextController.clear();
+                              _apellidotextController.clear();
+                              _ciTextController.clear();
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          'Cliente registrado recientemente')));
+                              _nameTextController.clear();
+                              _apellidotextController.clear();
+                              _ciTextController.clear();
+                            }
+                          } else {
                             _showDialog(cliente);
                           }
-
-                          /* print(cliente.idCola);
-                          print(cliente.ci);
-                          print(cliente.nombre);
-                          print(cliente.idEstado);
-                          print(cliente.fechaRegistro);
-                          print(cliente.idMunicipio);
-                          */
                         });
-
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text('Cliente insertado en la cola')));
-                        _nameTextController.clear();
-                        _apellidotextController.clear();
-                        _ciTextController.clear();
                       }
                     },
                     child: Text('Enviar')),
@@ -223,7 +228,7 @@ class _LineformState extends State<Lineform> {
     ClienteValidator? clientereal;
     for (int i = 0; i < clientesVerify!.length; i++) {
       if (cliente.ci == clientesVerify!.elementAt(i).ci &&
-          cliente.idCola == clientesVerify!.elementAt(i).idCola) {
+          cliente.id_cola == clientesVerify!.elementAt(i).idCola) {
         clientereal = clientesVerify!.elementAt(i);
         productos += '' + clientesVerify!.elementAt(i).nombProducto + '/';
       }
@@ -260,6 +265,17 @@ class _LineformState extends State<Lineform> {
                 backgroundColor:
                     MaterialStateColor.resolveWith((states) => Colors.blue)),
             onPressed: () {
+              ClienteColasActivas clienteRech = ClienteColasActivas(
+                  ci: clientereal!.ci,
+                  nombre: cliente.nombre,
+                  id_cola: cliente.id_cola,
+                  fv: '',
+                  id_estado: 2,
+                  id_municipio: cliente.id_municipio,
+                  fecha_modif: DateTime.now().toIso8601String(),
+                  fecha_registro: cliente.fecha_registro);
+              Provider.of<ClienteColaActivaProvider>(context, listen: false)
+                  .addClienteColaActiva(clienteRech, clienteRech.id_cola);
               Navigator.of(context).pop();
             }),
         ElevatedButton(
@@ -330,6 +346,7 @@ class _QRViewExampleState extends State<QRViewExample> {
 
   @override
   Widget build(BuildContext context) {
+    ClienteColasActivas? cliente;
     if (result != null && info) {
       //ACTUALIZAR POSICION DE COLA ACTIVA
 
@@ -338,24 +355,35 @@ class _QRViewExampleState extends State<QRViewExample> {
       List<String> datos =
           Provider.of<ClienteColaActivaProvider>(context, listen: false)
               .getQRCode(result!.code!.toLowerCase());
-      ClienteColasActivas cliente = ClienteColasActivas(
+      int idCola = Provider.of<ColasActivasProvider>(context, listen: false)
+          .colas[posactiva]
+          .id;
+      cliente = ClienteColasActivas(
           ci: datos[1],
           fv: datos[2],
-          fechaRegistro: DateTime.now(),
-          fechaModificacion: DateTime.now(),
-          idEstado: Estados.estados[0].id,
-          idCola: Provider.of<ColasActivasProvider>(context, listen: false)
-              .colas[posactiva]
-              .id,
+          fecha_registro: DateTime.now().toIso8601String(),
+          fecha_modif: DateTime.now().toIso8601String(),
+          id_estado: Estados.estados[0].id,
+          id_cola: idCola,
           nombre: datos[0],
-          idMunicipio:
+          id_municipio:
               Provider.of<MunicipioProvider>(context, listen: false).idActive);
       if (!clientesVerify!.any((element) =>
-          element.ci == cliente.ci && element.idCola == cliente.idCola))
+          int.parse(element.ci) == int.parse(cliente!.ci) &&
+          element.idCola == cliente.id_cola))
         Provider.of<ClienteColaActivaProvider>(context, listen: false)
-            .addClienteColaActiva(cliente);
+            .addClienteColaActiva(cliente, idCola);
       else {
-        _showDialog(cliente);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => QRFind(
+                      cliente: cliente,
+                      clientesVerify: clientesVerify,
+                      nombTiemda:
+                          Provider.of<LineProvider>(context, listen: false)
+                              .nomTienda,
+                    )));
       }
 
       info = false;
@@ -373,7 +401,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 children: <Widget>[
                   if (result != null)
                     Text(
-                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code}')
+                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${cliente!.ci} ${cliente.id_cola}')
                   else
                     const Text('Escanea Código'),
                   Row(
@@ -502,7 +530,7 @@ class _QRViewExampleState extends State<QRViewExample> {
     ClienteValidator? clientereal;
     for (int i = 0; i < clientesVerify!.length; i++) {
       if (cliente.ci == clientesVerify!.elementAt(i).ci &&
-          cliente.idCola == clientesVerify!.elementAt(i).idCola) {
+          cliente.id_cola == clientesVerify!.elementAt(i).idCola) {
         clientereal = clientesVerify!.elementAt(i);
         productos += '' + clientesVerify!.elementAt(i).nombProducto + '/';
       }

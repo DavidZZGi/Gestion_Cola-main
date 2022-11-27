@@ -18,7 +18,7 @@ class ClienteColaActivaProvider with ChangeNotifier {
   List<ClienteColasActivas> develverClientesDadoIdCola(int? idCola) {
     List<ClienteColasActivas> list = [];
     for (int i = 0; i < clienteColasActivas.length; i++) {
-      if (clienteColasActivas.elementAt(i).idCola == idCola) {
+      if (clienteColasActivas.elementAt(i).id_cola == idCola) {
         list.add(clienteColasActivas.elementAt(i));
       }
     }
@@ -27,16 +27,28 @@ class ClienteColaActivaProvider with ChangeNotifier {
 
   void develverClientesDadoIdColaSubList(int? idCola) {
     for (int i = 0; i < clienteColasActivas.length; i++) {
-      if (clienteColasActivas.elementAt(i).idCola == idCola) {
+      if (clienteColasActivas.elementAt(i).id_cola == idCola) {
         clienteColasActivasDeUnaColaAux.add(clienteColasActivas.elementAt(i));
       }
     }
   }
 
-  void addClienteColaActiva(ClienteColasActivas cliente) {
-    //if (!clienteColasActivas.any((element) => element.ci == cliente.ci))
-    clienteColasActivas.add(cliente);
+  bool addClienteColaActiva(ClienteColasActivas cliente, int idCola) {
+    if (clienteColasActivas.any(
+        (element) => element.ci == cliente.ci && element.id_cola == idCola)) {
+      return false;
+    } else
+      clienteColasActivas.add(cliente);
     notifyListeners();
+    return true;
+  }
+
+  bool clienteRepitido(ClienteColasActivas cliente) {
+    if (clienteColasActivas.any((element) =>
+        element.ci == cliente.ci && element.id_cola == cliente.id_cola)) {
+      return true;
+    } else
+      return false;
   }
 
   void addclienteColasActivasDeUnaColaAux(ClienteColasActivas cliente) {

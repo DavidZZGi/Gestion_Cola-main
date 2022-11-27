@@ -8,13 +8,13 @@
             "name": "LINE_MANAGEMENT",
             "request": "launch",
             "type": "dart",
-             "program": "lib/view/main.dart"
+             "program": "lib/main.dart"
         },
         {
             "name": "LINE_MANAGEMENT (profile mode)",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "release"
         },
         {
             "name": "LINE_MANAGEMENT (release mode)",

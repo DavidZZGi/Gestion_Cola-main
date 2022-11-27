@@ -34,6 +34,7 @@ class ConnectionServices {
     }
     final directory = await getApplicationDocumentsDirectory();
     final path = '${directory.path}/$dbName';
+    print(path);
     try {
       _db = await openDatabase(path);
 
@@ -103,7 +104,7 @@ return database;
   //CRUD Clientes-Colas-ACtivas
   Future<void> insertClienteColaActiva(ClienteColasActivas cliente) async {
     if (_db != null) {
-      await _db!.insert('clientes-colas-activas', cliente.toMap());
+      await _db!.insert('clientes_colas_activas', cliente.toMap());
     }
   }
 
@@ -150,7 +151,7 @@ return database;
   //Crud Colas-Activas
   Future<void> insertColaActiva(ColaActiva cola) async {
     if (_db != null) {
-      await _db!.insert('colas-activas', cola.toMap());
+      await _db!.insert('colas_activas', cola.toMap());
     }
   }
 
@@ -163,13 +164,13 @@ return database;
   Future<List<ColaActiva>> getAllColasActivas() async {
     if (_db != null) {
       final List<Map<String, dynamic>> colasActivas =
-          await _db!.query('colas-activas', distinct: true);
+          await _db!.query('colas_activas', distinct: true);
       return List.generate(colasActivas.length, (i) {
         print(colasActivas[i]);
         return ColaActiva(
             id: colasActivas[i]['id'],
             fecha: colasActivas[i]['fecha'],
-            idTienda: colasActivas[i]['idTienda']);
+            tienda: colasActivas[i]['idTienda']);
       });
     } else
       return [];
@@ -196,8 +197,8 @@ return database;
       return List.generate(productosCola.length, (i) {
         print(productosCola[i]);
         return ProductosColas(
-          idCola: productosCola[i]['idCola'],
-          idProducto: productosCola[i]['idProducto'],
+          id_cola: productosCola[i]['idCola'],
+          id_producto: productosCola[i]['idProducto'],
         );
       });
     } else

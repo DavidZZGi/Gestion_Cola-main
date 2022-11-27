@@ -16,7 +16,7 @@ class ProductosColasProvider with ChangeNotifier {
   List<ProductosColas> develverProductosDadoIdCola(int idCola) {
     List<ProductosColas> productosDeUnaCola = [];
     for (var element in productosCola) {
-      if (element.idCola == idCola) {
+      if (element.id_cola == idCola) {
         productosDeUnaCola.add(element);
       }
     }
@@ -33,8 +33,17 @@ class ProductosColasProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addProductoCola(ProductosColas product) {
-    productosCola.remove(product);
+  void removeProductoColaByName(String product) {
+    productosCola.removeWhere((element) => element.nombreProducto == product);
+    notifyListeners();
+  }
+
+  void addProductoCola(ProductosColas product, int idColaActiva) {
+    if (productosCola.any((element) =>
+        element.id_producto == product.id_producto &&
+        element.id_cola == idColaActiva)) {
+    } else
+      productosCola.add(product);
     notifyListeners();
   }
 }

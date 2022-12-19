@@ -116,7 +116,18 @@ class _MyTapBarState extends State<MyTapBar> {
                                     content: Text(
                                         'La cola ${value.colas[index].id} fue eliminada')));
                                 setState(() {
+                                  Provider.of<ProductosColasProvider>(context,
+                                          listen: false)
+                                      .removeTodosProductoColaByIdCola(
+                                          value.colas[index].id);
+                                  Provider.of<ClienteColaActivaProvider>(
+                                          context,
+                                          listen: false)
+                                      .removeTodosClienteColaActiva(
+                                          value.colas[index].id);
                                   value.colas.remove(value.colas[index]);
+                                  value.setPosColaActiva(
+                                      value.posColaActiva - 1);
                                 });
                               },
                               child: InkWell(
@@ -191,9 +202,9 @@ class _MyTapBarState extends State<MyTapBar> {
             ),
             //Second Tab item
 
-            Consumer<LineProvider>(
+            Consumer<ColasActivasProvider>(
               builder: (context, value, child) {
-                if (value.colaCreada) {
+                if (value.colas.length > 0) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -207,7 +218,7 @@ class _MyTapBarState extends State<MyTapBar> {
                               fixedSize: const Size(60, 60),
                               shape: const CircleBorder(),
                             ),
-                            onPressed: value.colaCreada
+                            onPressed: value.colas.length > 0
                                 ? () {
                                     Navigator.of(context)
                                         .pushNamed('/productsearch');
@@ -222,28 +233,91 @@ class _MyTapBarState extends State<MyTapBar> {
             ),
 
             //Third tab item
-            Consumer<LineProvider>(
+            Consumer<ColasActivasProvider>(
               builder: (context, value, child) {
-                if (value.colaCreada) {
+                if (value.colas.length > 0) {
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Expanded(child: MylistView()),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: ElevatedButton(
-                            child: Icon(Icons.add),
-                            style: ElevatedButton.styleFrom(
-                              fixedSize: const Size(60, 60),
-                              shape: const CircleBorder(),
-                            ),
-                            onPressed: value.colaCreada
-                                ? () {
-                                    Navigator.of(context)
-                                        .pushNamed('/lineform');
-                                  }
-                                : null),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: ElevatedButton(
+                                child: Icon(Icons.add),
+                                style: ElevatedButton.styleFrom(
+                                  fixedSize: const Size(60, 60),
+                                  shape: const CircleBorder(),
+                                ),
+                                onPressed: value.colas.length > 0
+                                    ? () {
+                                        Navigator.of(context)
+                                            .pushNamed('/lineform');
+                                      }
+                                    : null),
+                          ),
+                          Consumer<ClienteColaActivaProvider>(
+                            builder: (context, value, child) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                    child: Icon(Icons.shopping_cart),
+                                    style: ElevatedButton.styleFrom(
+                                      fixedSize: const Size(60, 60),
+                                      shape: const CircleBorder(),
+                                    ),
+                                    onPressed: value
+                                                .clienteColasActivas.length >
+                                            0
+                                        ? () {
+                                            bool encontro = false;
+                                            for (int i = 0;
+                                                i <
+                                                        value
+                                                            .clienteColasActivas
+                                                            .length &&
+                                                    !encontro;
+                                                i++) {
+                                              if (value.clienteColasActivas
+                                                      .elementAt(i)
+                                                      .id_cola ==
+                                                  Provider.of<ColasActivasProvider>(
+                                                          context,
+                                                          listen: false)
+                                                      .colas[Provider.of<
+                                                                  ColasActivasProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .posColaActiva]
+                                                      .id) {
+                                                if (value.clienteColasActivas
+                                                        .elementAt(i)
+                                                        .id_estado ==
+                                                    1) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                          duration: Duration(
+                                                              seconds: 2),
+                                                          content: Text(
+                                                              '${value.clienteColasActivas[i].nombre} acaba de comprar')));
+                                                  setState(() {
+                                                    value.clienteColasActivas
+                                                        .elementAt(i)
+                                                        .setIdEstado(4);
+                                                    encontro = true;
+                                                  });
+                                                }
+                                              }
+                                            }
+                                          }
+                                        : null),
+                              );
+                            },
+                          )
+                        ],
                       ),
                     ],
                   );

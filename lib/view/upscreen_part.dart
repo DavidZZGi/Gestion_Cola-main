@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:line_management/model/cliente-colas-activas.dart';
 import 'package:line_management/model/colas-activas.dart';
 import 'package:line_management/model/line.dart';
+import 'package:line_management/model/productos-colas.dart';
 import 'package:line_management/provider/clientesColasActivasProvider.dart';
 import 'package:line_management/provider/colasActivasProvider.dart';
 import 'package:line_management/provider/connectionProvider.dart';
@@ -91,10 +94,63 @@ class _UpScreenPartState extends State<UpScreenPart> {
     }
   }
 
+  bool ActiveConnection = false;
+  String T = "";
+  Future<bool> checkUserConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        return true;
+      }
+    } on SocketException catch (_) {
+      ActiveConnection = false;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          duration: Duration(seconds: 2), content: Text('No hay internet')));
+      return false;
+    }
+    return false;
+  }
+
+  void insertarAllProductoServidor() async {
+    for (var element
+        in Provider.of<ProductosColasProvider>(context, listen: false)
+            .productosCola) {
+      await Provider.of<ProductosColasProvider>(context, listen: false)
+          .insertarProductoColaEnServidor(element);
+    }
+  }
+
+  void insertarAllColasServidor() async {
+    for (var element
+        in Provider.of<ColasActivasProvider>(context, listen: false).colas) {
+      await Provider.of<ColasActivasProvider>(context, listen: false)
+          .insertColaActivaServer(element);
+    }
+  }
+
+  void insertarAllClientesServidor() async {
+    for (var element
+        in Provider.of<ClienteColaActivaProvider>(context, listen: false)
+            .clienteColasActivas) {
+      await Provider.of<ClienteColaActivaProvider>(context, listen: false)
+          .createClienteColaServer(element);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     bool creoCola =
         Provider.of<LineProvider>(context, listen: false).colaCreada;
+
+    Provider.of<ClienteColaActivaProvider>(context, listen: false)
+        .clienteColasActivas
+        .length;
+
     return OverflowBox(
       child: Container(
         decoration: BoxDecoration(
@@ -127,6 +183,19 @@ class _UpScreenPartState extends State<UpScreenPart> {
                       color: Colors.white,
                     ),
                     onPressed: () async {
+                      if (Provider.of<ProductosColasProvider>(context,
+                                  listen: false)
+                              .productosCola
+                              .length >
+                          0) {
+                        insertarAllProductoServidor();
+                        insertarAllClientesServidor();
+                        insertarAllColasServidor();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            duration: Duration(seconds: 2),
+                            content: Text('Colas exportadas exitosamente')));
+
+                        /*
                       await Provider.of<ClienteColaActivaProvider>(context,
                               listen: false)
                           .insertAllClienteColaActiva();
@@ -139,6 +208,8 @@ class _UpScreenPartState extends State<UpScreenPart> {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           duration: Duration(seconds: 2),
                           content: Text('Colas exportadas exitosamente')));
+                          */
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       fixedSize: const Size(60, 60),
@@ -153,7 +224,7 @@ class _UpScreenPartState extends State<UpScreenPart> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Text(
-                    'Cubacola',
+                    'Cola.cu',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 30.0,
@@ -165,8 +236,34 @@ class _UpScreenPartState extends State<UpScreenPart> {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: ElevatedButton(
-                            child: Text('Cambiar Estados'),
-                            onPressed: value.colaCreada ? () {} : null),
+                            style: ElevatedButton.styleFrom(
+                              shape: const CircleBorder(),
+                              fixedSize: const Size(85, 70),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Flexible(child: Text('Subcola')),
+                                Flexible(child: Icon(Icons.add))
+                              ],
+                            ),
+                            onPressed: value.colaCreada
+                                ? () {
+                                    setState(() {
+                                      if (Provider.of<ClienteColaActivaProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .clienteColasActivas
+                                              .length >
+                                          0) {
+                                        _showDialog(
+                                            _buildAlertDialogCrearSubola());
+                                      } else {
+                                        _showDialogSubColaSinCliente();
+                                      }
+                                    });
+                                  }
+                                : null),
                       );
                     },
                     /*child: Padding(
@@ -196,7 +293,7 @@ class _UpScreenPartState extends State<UpScreenPart> {
                 Padding(
                   padding: EdgeInsets.only(top: 8.0),
                   child: Flexible(
-                    child: Text('Crear subcola',
+                    child: Text('Importar',
                         style: TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
@@ -208,29 +305,24 @@ class _UpScreenPartState extends State<UpScreenPart> {
                       child: Flexible(
                         child: ElevatedButton(
                           child: Icon(
-                            Icons.add,
+                            Icons.download,
                             color: Colors.white,
                           ),
-                          onPressed: value.colaCreada
-                              ? () {
-                                  setState(() {
-                                    if (Provider.of<ClienteColaActivaProvider>(
-                                                context,
-                                                listen: false)
-                                            .clienteColasActivas
-                                            .length >
-                                        0) {
-                                      crearCola();
-                                      if (crearListaClienteSubCola().isNotEmpty)
-                                        _showDialog();
-                                      else
-                                        _showDialogSubColaSinCliente();
-                                    } else {
-                                      _showDialogSubColaSinCliente();
-                                    }
-                                  });
-                                }
-                              : null,
+                          onPressed: () {
+                            Provider.of<ColasActivasProvider>(context,
+                                    listen: false)
+                                .importarColasActivas();
+                            Provider.of<ClienteColaActivaProvider>(context,
+                                    listen: false)
+                                .importarClientes();
+                            Provider.of<ProductosColasProvider>(context,
+                                    listen: false)
+                                .importarProductosColas();
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                duration: Duration(seconds: 2),
+                                content:
+                                    Text('Colas importadas exitosamente')));
+                          },
                           style: ElevatedButton.styleFrom(
                             fixedSize: const Size(60, 60),
                             shape: const CircleBorder(),
@@ -277,11 +369,11 @@ class _UpScreenPartState extends State<UpScreenPart> {
       return AlertSubcolaSinCliente(context: context);
   }
 
-  void _showDialog() {
+  void _showDialog(Widget widget) {
     showDialog(
         context: context,
         builder: (context) {
-          return _buildAlertDialog();
+          return widget;
         });
   }
 
@@ -316,6 +408,32 @@ class _UpScreenPartState extends State<UpScreenPart> {
                     MaterialStateColor.resolveWith((states) => Colors.blue)),
             onPressed: () {
               Navigator.of(context).pushNamed('/cubacola');
+            }),
+        ElevatedButton(
+            child: Text("Cancelar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.red)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+      ],
+    );
+  }
+
+  Widget _buildAlertDialogCrearSubola() {
+    return AlertDialog(
+      title: Text('Esta seguro que desea crear una subcola'),
+      actions: <Widget>[
+        ElevatedButton(
+            child: Text("Aceptar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.blue)),
+            onPressed: () {
+              crearCola();
+              if (crearListaClienteSubCola().isNotEmpty)
+                _showDialog(_buildAlertDialog());
             }),
         ElevatedButton(
             child: Text("Cancelar"),

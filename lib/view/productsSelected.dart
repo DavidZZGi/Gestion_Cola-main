@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:line_management/model/productos-colas.dart';
+import 'package:line_management/provider/productProvider.dart';
 import 'package:line_management/provider/productosColasProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,7 @@ class _ProductSelectedState extends State<ProductSelected> {
   @override
   void initState() {
     super.initState();
+
     Provider.of<ConnectionProvider>(context, listen: false).getAllProducts();
     posCola =
         Provider.of<ColasActivasProvider>(context, listen: false).posColaActiva;
@@ -47,7 +49,7 @@ class _ProductSelectedState extends State<ProductSelected> {
                   )),
                   color: Colors.red,
                 ),
-                key: ValueKey<String>(productos[i].nombreProducto!),
+                key: ValueKey<int>(productos[i].id_producto),
                 onDismissed: (DismissDirection direction) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       duration: Duration(seconds: 2),
@@ -71,7 +73,7 @@ class _ProductSelectedState extends State<ProductSelected> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${productos[i].nombreProducto!}',
+                          '${Provider.of<ConnectionProvider>(context, listen: false).nomProductdadoId(productos[i].id_producto)}',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black45,

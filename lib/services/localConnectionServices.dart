@@ -251,15 +251,6 @@ return database;
     }
   }
 
-/*
-  Future<void> insertarCliente(Cliente cliente) async {
-    if (_dbcargada != null) {
-      await _dbcargada!.insert('cliente', cliente.toMap(),
-          conflictAlgorithm: ConflictAlgorithm.replace);
-      print(cliente.toMap());
-    }
-  }
-*/
 //Insertar cliente en bd limpia
   Future<void> insertarClienteEnBDLimpia(Cliente cliente) async {
     if (_db != null) {

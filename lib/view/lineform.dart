@@ -50,6 +50,7 @@ class _LineformState extends State<Lineform> {
         .cargarAllValidatorData();
     clientesVerify = Provider.of<GestionadorProvider>(context, listen: false)
         .clienteValidator;
+    Provider.of<ConnectionProvider>(context, listen: false).getAllShops();
   }
 
   final formKey = GlobalKey<FormBuilderState>();
@@ -84,7 +85,10 @@ class _LineformState extends State<Lineform> {
                         controller: _nameTextController,
                         decoration: const InputDecoration(labelText: 'Nombre'),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                        validator: FormBuilderValidators.compose([]),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                              errorText: 'No puede dejar campo vacio')
+                        ]),
                       ),
                     ),
                   ),
@@ -94,7 +98,10 @@ class _LineformState extends State<Lineform> {
                       controller: _apellidotextController,
                       decoration: const InputDecoration(labelText: 'Apellidos'),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: FormBuilderValidators.compose([]),
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                            errorText: 'No puede dejar campo vacio')
+                      ]),
                     ),
                   ),
                 ],
@@ -111,9 +118,15 @@ class _LineformState extends State<Lineform> {
                             labelText: 'Carnet de Identidad'),
                         autovalidateMode: AutovalidateMode.onUserInteraction,
                         validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.numeric(),
-                          FormBuilderValidators.minLength(11),
-                          FormBuilderValidators.maxLength(11),
+                          FormBuilderValidators.numeric(
+                              errorText:
+                                  'El carnet de identidad debe tener valor numerico '),
+                          FormBuilderValidators.minLength(11,
+                              errorText:
+                                  'El carnet de identidad debe tener 11 cifras'),
+                          FormBuilderValidators.maxLength(11,
+                              errorText:
+                                  'El carnet de identidad debe tener 11 cifras'),
                         ]),
                       ),
                     ),
@@ -158,14 +171,16 @@ class _LineformState extends State<Lineform> {
                                   .idActive);
 
                           //ANADIR A LA LISTA
-                          if (!clientesVerify!.any((element) =>
-                              element.ci == cliente.ci &&
-                              element.idCola == cliente.id_cola)) {
+                          if (!Provider.of<GestionadorProvider>(context,
+                                  listen: false)
+                              .clienteValidator
+                              .any((element) => element.ci == cliente.ci)) {
                             if (Provider.of<ClienteColaActivaProvider>(context,
                                     listen: false)
                                 .addClienteColaActiva(cliente, idCola)) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
+                                      duration: Duration(seconds: 2),
                                       content: Text(
                                           'Cliente registrado en la cola')));
                               _nameTextController.clear();
@@ -174,6 +189,7 @@ class _LineformState extends State<Lineform> {
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
+                                      duration: Duration(seconds: 2),
                                       content: Text(
                                           'Cliente registrado recientemente')));
                               _nameTextController.clear();
@@ -184,6 +200,11 @@ class _LineformState extends State<Lineform> {
                             _showDialog(cliente);
                           }
                         });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            duration: Duration(seconds: 2),
+                            content: Text(
+                                'Campos: nombres o apellidos, estan vacios')));
                       }
                     },
                     child: Text('Enviar')),
@@ -226,18 +247,33 @@ class _LineformState extends State<Lineform> {
   Widget _buildAlertDialog(ClienteColasActivas cliente) {
     String productos = '';
     ClienteValidator? clientereal;
-    for (int i = 0; i < clientesVerify!.length; i++) {
-      if (cliente.ci == clientesVerify!.elementAt(i).ci &&
-          cliente.id_cola == clientesVerify!.elementAt(i).idCola) {
-        clientereal = clientesVerify!.elementAt(i);
-        productos += '' + clientesVerify!.elementAt(i).nombProducto + '/';
+    for (int i = 0;
+        i <
+            Provider.of<GestionadorProvider>(context, listen: false)
+                .clienteValidator
+                .length;
+        i++) {
+      if (cliente.ci ==
+          Provider.of<GestionadorProvider>(context, listen: false)
+              .clienteValidator
+              .elementAt(i)
+              .ci) {
+        clientereal = Provider.of<GestionadorProvider>(context, listen: false)
+            .clienteValidator
+            .elementAt(i);
+        productos += '' +
+            Provider.of<GestionadorProvider>(context, listen: false)
+                .clienteValidator
+                .elementAt(i)
+                .nombProducto +
+            '/';
       }
     }
     print(productos);
     int idTienda = int.parse(clientereal!.idCola.toString().substring(0, 3));
     print(idTienda);
-    String nombTiemda =
-        Provider.of<LineProvider>(context, listen: false).nomTienda;
+    String nombTiemda = Provider.of<ConnectionProvider>(context, listen: false)
+        .nomShopId(idTienda);
     String fecha = '2' + clientereal.idCola.toString().substring(3, 8);
     String fechareal = fecha.substring(0, 2) +
         '/' +
@@ -374,16 +410,18 @@ class _QRViewExampleState extends State<QRViewExample> {
         Provider.of<ClienteColaActivaProvider>(context, listen: false)
             .addClienteColaActiva(cliente, idCola);
       else {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => QRFind(
-                      cliente: cliente,
-                      clientesVerify: clientesVerify,
-                      nombTiemda:
-                          Provider.of<LineProvider>(context, listen: false)
-                              .nomTienda,
-                    )));
+        Future.delayed(Duration.zero, () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => QRFind(
+                        cliente: cliente,
+                        clientesVerify: clientesVerify,
+                        nombTiemda:
+                            Provider.of<LineProvider>(context, listen: false)
+                                .nomTienda,
+                      )));
+        });
       }
 
       info = false;
@@ -401,7 +439,7 @@ class _QRViewExampleState extends State<QRViewExample> {
                 children: <Widget>[
                   if (result != null)
                     Text(
-                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${cliente!.ci} ${cliente.id_cola}')
+                        'Barcode Type: ${describeEnum(result!.format)}   Data: ${result!.code} ')
                   else
                     const Text('Escanea Código'),
                   Row(

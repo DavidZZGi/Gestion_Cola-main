@@ -103,6 +103,7 @@ class ConnectionProvider with ChangeNotifier {
 
   String nomProductdadoId(int id) {
     String result = '';
+
     for (var item in products) {
       if (item.id == id) {
         result = item.productName;

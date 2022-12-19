@@ -1,38 +1,45 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:line_management/model/colas-activas.dart';
 
 import '../model/line.dart';
 
-class LineService {
-  static const String url = 'http://localhost:3003/line';
+class ColaActivaService {
+  static const String url = 'http://10.0.2.2:3006/cola';
+  Future<http.Response> createLine(ColaActiva cola) async {
+    return http.post(
+      Uri.parse('$url/create'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'id': cola.id.toString(),
+        'tienda': cola.tienda,
+        'fecha': cola.fecha,
+      }),
+    );
+  }
 
-  DateTime fecha =
-      DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+  Future<List<ColaActiva>> fetchAllColosActivas() async {
+    List<ColaActiva> products = [];
+    http.Response response = await http.get(Uri.parse('$url'));
 
-  Future<bool> createLine(Line line, String ci) async {
-    try {
-      final result = await InternetAddress.lookup('google.com');
-      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
-        http.post(
-          Uri.parse('$url/create'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonEncode(<String, dynamic>{
-            'id:producto': line.nomProducts,
-            'carnet_identidad': ci,
-            'fecha': fecha,
-            'id_municipio': line.idMun,
-            'id_tienda': line.idTienda
-          }),
+    if (response.statusCode == 200) {
+      final resul = jsonDecode(response.body);
+      print(resul);
+      for (var item in resul) {
+        ColaActiva cola = ColaActiva(
+          id: int.parse(item['id']),
+          tienda: item['tienda'],
+          fecha: item['fecha'],
         );
-        return true;
+        products.add(cola);
       }
-    } on SocketException catch (_) {
-      print('No connection');
-    }
 
-    return false;
+      return products;
+    } else {
+      throw Exception('No se pudo hacer el request');
+    }
   }
 }

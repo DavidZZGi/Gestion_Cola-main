@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:line_management/model/client.dart';
+import 'package:line_management/model/cliente-colas-activas.dart';
 import 'package:line_management/services/clientServices.dart';
 
 class ClienteProvider with ChangeNotifier {
   ClienteService _clienteService = ClienteService();
-  List<Cliente> listacliente = [];
+  List<ClienteColasActivas> listacliente = [];
   late Cliente aux;
 
   ClienteProvider.init() {
@@ -27,7 +28,7 @@ return listacliente;
 }
 */
 
-  Future<List<Cliente>> loadClientes() async {
+  Future<List<ClienteColasActivas>> loadClientes() async {
     listacliente = await _clienteService.fetchAllClients();
     notifyListeners();
     return listacliente;
@@ -45,18 +46,6 @@ return listacliente;
     print(aux);
     notifyListeners();
     return aux;
-  }
-
-  void addCliente(Cliente cliente) {
-    Cliente newcliente = Cliente(
-        /*idCliente: cliente.idCliente,*/ carnetIdentidad:
-            cliente.carnetIdentidad,
-        nombre: cliente.nombre,
-        apellidos: cliente.apellidos,
-        idEstado: cliente.idEstado);
-    if (listacliente.contains(newcliente) == false)
-      listacliente.add(newcliente);
-//notifyListeners();
   }
 
   void removeCliente(Cliente cliente) {
@@ -81,7 +70,7 @@ return listacliente;
         nombre: nombreClient,
         apellidos: apellidosClient,
         idEstado: 1);
-    listacliente.add(cliente);
+    //  listacliente.add(cliente);
 //notifyListeners();
     return cliente;
   }

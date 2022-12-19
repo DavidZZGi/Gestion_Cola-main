@@ -18,24 +18,29 @@ class QRFind extends StatelessWidget {
     for (int i = 0; i < clientesVerify!.length; i++) {
       if (cliente.ci == clientesVerify!.elementAt(i).ci &&
           cliente.id_cola == clientesVerify!.elementAt(i).id_cola) {
-        clientereal = clientesVerify!.elementAt(i);
+        // clientereal = clientesVerify!.elementAt(i);
+        clientereal = ClienteValidator(
+            ci: clientesVerify!.elementAt(i).ci,
+            idCola: clientesVerify!.elementAt(i).id_cola,
+            nombProducto: clientesVerify!.elementAt(i).nombProducto,
+            idEstado: clientesVerify!.elementAt(i).idEstado);
         productos += '' + clientesVerify!.elementAt(i).nombProducto + '/';
       }
     }
     print(productos);
-    int idTienda = int.parse(clientereal!.idCola.toString().substring(0, 3));
+    int idTienda = int.parse(cliente!.id_cola.toString().substring(0, 3));
     print(idTienda);
 
-    String fecha = '2' + clientereal.idCola.toString().substring(3, 8);
+    String fecha = '2' + cliente.id_cola.toString().substring(3, 8);
     String fechareal = fecha.substring(0, 2) +
         '/' +
         fecha.substring(2, 4) +
         '/' +
         fecha.substring(4, 6);
     return Scaffold(
+      appBar: AppBar(),
       body: Container(
         padding: EdgeInsets.all(12.0),
-        height: 100,
         decoration: BoxDecoration(
             shape: BoxShape.rectangle,
             borderRadius: BorderRadius.circular(12),
@@ -47,12 +52,15 @@ class QRFind extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text('Cliente encontrado en el sistema'),
-              Text('CI: ${clientereal.ci}'),
+              Text(
+                'Cliente encontrado en el sistema',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text('CI: ${cliente.ci}'),
               Text('Productos: $productos'),
               Text('Tienda: $nombTiemda'),
               Text('Fecha: $fechareal'),
-              Text('Estado: ${Estados.getEstadoName(clientereal.idEstado)}')
+              Text('Estado: ${Estados.getEstadoName(cliente.id_estado)}')
             ],
           ),
         ),

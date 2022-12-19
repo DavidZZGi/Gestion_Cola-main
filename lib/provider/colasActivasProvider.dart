@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
 import 'package:line_management/model/cliente-colas-activas.dart';
+import 'package:line_management/services/lineService.dart';
 
 import '../model/colas-activas.dart';
 import 'connectionProvider.dart';
@@ -11,11 +12,21 @@ class ColasActivasProvider with ChangeNotifier {
   bool isSelected = false;
   String? fecha;
   bool creadaPorPrimeraVez = true;
+  ColaActivaService colaService = ColaActivaService();
 
   Future<void> insertAllColasActivas() async {
     if (ConnectionProvider.isConnected) {
       await ConnectionProvider.connection.insertAllColasActivas(colas);
     }
+    notifyListeners();
+  }
+
+  Future<void> insertColaActivaServer(ColaActiva cola) async {
+    await colaService.createLine(cola);
+  }
+
+  Future<void> importarColasActivas() async {
+    colas = await colaService.fetchAllColosActivas();
     notifyListeners();
   }
 

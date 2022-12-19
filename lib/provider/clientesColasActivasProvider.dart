@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:line_management/model/cliente-colas-activas.dart';
+import 'package:line_management/services/clientServices.dart';
 
 import 'connectionProvider.dart';
 
 class ClienteColaActivaProvider with ChangeNotifier {
   List<ClienteColasActivas> clienteColasActivas = [];
   List<ClienteColasActivas> clienteColasActivasDeUnaColaAux = [];
+  ClienteService clienteService = ClienteService();
 
   Future<void> insertAllClienteColaActiva() async {
     if (ConnectionProvider.isConnected) {
@@ -61,6 +63,11 @@ class ClienteColaActivaProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeTodosClienteColaActiva(int idCola) {
+    clienteColasActivas.removeWhere((element) => element.id_cola == idCola);
+    notifyListeners();
+  }
+
   List<String> getQRCode(String? clienteS) {
     List<String> datos = [];
     String client = clienteS!.trim();
@@ -79,5 +86,14 @@ class ClienteColaActivaProvider with ChangeNotifier {
     datos.add(carnetIdnt);
     datos.add(fv);
     return datos;
+  }
+
+  Future<void> createClienteColaServer(ClienteColasActivas cliente) async {
+    await clienteService.createUser(cliente);
+  }
+
+  Future<void> importarClientes() async {
+    clienteColasActivas = await clienteService.fetchAllClients();
+    notifyListeners();
   }
 }

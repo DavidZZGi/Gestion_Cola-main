@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:line_management/model/Product.dart';
+import 'package:line_management/model/productos-colas.dart';
 import 'package:line_management/services/productoService.dart';
 
 class ProductProvider with ChangeNotifier {
   ProductoService _productService = ProductoService();
   List<Product> products = [];
+  List<ProductosColas> productosCola = [];
+
   int? idProductSelected;
   bool agregado = false;
 
@@ -17,10 +20,10 @@ class ProductProvider with ChangeNotifier {
     products = await productInit;
   }
 
-  Future<List<Product>> getAllProducts() async {
-    products = await _productService.fetchAllProduct();
+  Future<List<ProductosColas>> getAllProducts() async {
+    productosCola = await _productService.fetchAllProduct();
     notifyListeners();
-    return products;
+    return productosCola;
   }
 
   int idNomProduct(String nameProduct) {

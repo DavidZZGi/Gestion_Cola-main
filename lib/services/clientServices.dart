@@ -1,21 +1,25 @@
 import 'package:line_management/model/client.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:line_management/model/cliente-colas-activas.dart';
 
 class ClienteService {
-  static const url = 'http://localhost:3000/users';
-  Future<List<Cliente>> fetchAllClients() async {
-    List<Cliente> result = [];
+  static const url = 'http://10.0.2.2:3000/cliente';
+  Future<List<ClienteColasActivas>> fetchAllClients() async {
+    List<ClienteColasActivas> result = [];
     http.Response response = await http.get(Uri.parse('$url'));
     if (response.statusCode == 200) {
       final resul = jsonDecode(response.body);
       for (var item in resul) {
-        Cliente aux = Cliente(
-            /*idCliente: item['idCliente'],*/
+        ClienteColasActivas aux = ClienteColasActivas(
             nombre: item['nombre'],
-            carnetIdentidad: item['carnetIdentidad'],
-            apellidos: item['apellidos'],
-            idEstado: item['idEstado']);
+            ci: item['ci'],
+            id_cola: int.parse(item['id_cola']),
+            id_estado: item['id_estado'],
+            fecha_modif: item['fecha_modif'],
+            fecha_registro: item['fecha_registro'],
+            fv: item['fv'],
+            id_municipio: item['id_municipio']);
         result.add(aux);
       }
       return result;
@@ -24,17 +28,21 @@ class ClienteService {
     }
   }
 
-  Future<http.Response> createUser(Cliente user) {
+  Future<http.Response> createUser(ClienteColasActivas cliente) {
     return http.post(
       Uri.parse('$url/create'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, dynamic>{
-        //'idCliente': user.idCliente,
-        'nombre': user.nombre,
-        'carnetIdentidad': user.carnetIdentidad,
-        'apellidos': user.apellidos,
+        'nombre': cliente.nombre,
+        'ci': cliente.ci,
+        'id_cola': cliente.id_cola.toString(),
+        'fv': cliente.fv,
+        'fecha_registro': cliente.fecha_registro,
+        'fecha_modif': cliente.fecha_modif,
+        'id_estado': cliente.id_estado,
+        'id_municipio': cliente.id_municipio
       }),
     );
   }

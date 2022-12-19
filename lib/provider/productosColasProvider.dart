@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
+import 'package:line_management/services/productoService.dart';
+import 'package:line_management/services/shopServices.dart';
 
 import '../model/productos-colas.dart';
 import 'connectionProvider.dart';
 
 class ProductosColasProvider with ChangeNotifier {
   List<ProductosColas> productosCola = [];
+  ProductoService productService = ProductoService();
 
   Future<void> insertAllproductosCola() async {
     if (ConnectionProvider.isConnected) {
@@ -38,12 +41,27 @@ class ProductosColasProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void removeTodosProductoColaByIdCola(int idCola) {
+    productosCola.removeWhere((element) => element.id_cola == idCola);
+    notifyListeners();
+  }
+
   void addProductoCola(ProductosColas product, int idColaActiva) {
     if (productosCola.any((element) =>
         element.id_producto == product.id_producto &&
         element.id_cola == idColaActiva)) {
     } else
       productosCola.add(product);
+    notifyListeners();
+  }
+
+  Future<void> insertarProductoColaEnServidor(
+      ProductosColas productoCola) async {
+    await productService.createProductoCola(productoCola);
+  }
+
+  Future<void> importarProductosColas() async {
+    productosCola = await productService.fetchAllProduct();
     notifyListeners();
   }
 }

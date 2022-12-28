@@ -91,6 +91,16 @@ class ConnectionProvider with ChangeNotifier {
     return '';
   }
 
+  Future<String> nomShopIdAsync(int id) async {
+    await getAllShops();
+    for (var item in shops) {
+      if (item.id == id) {
+        return item.name;
+      }
+    }
+    return '';
+  }
+
   int idNomProduct(String nameProduct) {
     int id = 0;
     for (var item in products) {
@@ -110,5 +120,9 @@ class ConnectionProvider with ChangeNotifier {
       }
     }
     return result;
+  }
+
+  Future<void> updateBD(path) async {
+    await connection.updateBDCargada(path);
   }
 }

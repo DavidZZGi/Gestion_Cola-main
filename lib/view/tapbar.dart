@@ -11,6 +11,7 @@ import 'package:line_management/provider/lineProvider.dart';
 import 'package:line_management/provider/munprovider.dart';
 import 'package:line_management/provider/productProvider.dart';
 import 'package:line_management/provider/productosColasProvider.dart';
+import 'package:line_management/provider/shopProvider.dart';
 
 import 'package:line_management/view/productsSelected.dart';
 
@@ -44,12 +45,26 @@ class _MyTapBarState extends State<MyTapBar> {
           elevation: 0.0,
           backgroundColor: Color.fromARGB(185, 58, 112, 128),
           //shadowColor: Colors.grey,
-          title: FutureBuilder<String>(
-            future: fecha,
-            builder: (context, snapshot) {
-              Provider.of<ColasActivasProvider>(context, listen: false)
-                  .setFecha(snapshot.data);
-              return Text('${snapshot.data}');
+          title: Consumer<ColasActivasProvider>(
+            builder: (context, value, child) {
+              return FutureBuilder<String>(
+                future: fecha,
+                builder: (context, snapshot) {
+                  Provider.of<ColasActivasProvider>(context, listen: false)
+                      .setFecha(snapshot.data);
+                  if (value.colas.length == 0)
+                    return Text('${snapshot.data}');
+                  else {
+                    if (value.colas[value.posColaActiva].nombTienda != null)
+                      return Text(
+                          '${value.colas[value.posColaActiva].nombTienda}');
+                    else {
+                      return Text(
+                          '${Provider.of<ConnectionProvider>(context, listen: false).nomShopId(int.parse(value.colas[posActiva].id.toString().substring(0, 3)))}');
+                    }
+                  }
+                },
+              );
             },
           ),
 
@@ -179,16 +194,19 @@ class _MyTapBarState extends State<MyTapBar> {
                                 child: Card(
                                   color: Colors.lightBlue,
                                   child: ListTile(
-                                    leading: Icon(
-                                      Icons.person_add_disabled_rounded,
-                                      color: value.colas[index].isSelected
-                                          ? Colors.green
-                                          : Colors.grey,
-                                    ),
-                                    title: Text('${value.colas[index].id}'),
-                                    subtitle: Text(
-                                        '${value.colas[index].nombTienda}'),
-                                  ),
+                                      leading: Icon(
+                                        Icons.person_add_disabled_rounded,
+                                        color: value.colas[index].isSelected
+                                            ? Colors.green
+                                            : Colors.grey,
+                                      ),
+                                      title: Text('${value.colas[index].id}'),
+                                      subtitle: value.colas[index].nombTienda !=
+                                              null
+                                          ? Text(
+                                              '${value.colas[index].nombTienda}')
+                                          : Text(
+                                              '${Provider.of<ConnectionProvider>(context, listen: false).nomShopId(int.parse(Provider.of<ColasActivasProvider>(context, listen: false).colas[index].id.toString().substring(0, 3)))}')),
                                 ),
                               ),
                             );
@@ -307,6 +325,64 @@ class _MyTapBarState extends State<MyTapBar> {
                                                     value.clienteColasActivas
                                                         .elementAt(i)
                                                         .setIdEstado(4);
+                                                    encontro = true;
+                                                  });
+                                                }
+                                              }
+                                            }
+                                          }
+                                        : null),
+                              );
+                            },
+                          ),
+                          Consumer<ClienteColaActivaProvider>(
+                            builder: (context, value, child) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ElevatedButton(
+                                    child: Icon(Icons.remove_circle),
+                                    style: ElevatedButton.styleFrom(
+                                      fixedSize: const Size(60, 60),
+                                      shape: const CircleBorder(),
+                                    ),
+                                    onPressed: value
+                                                .clienteColasActivas.length >
+                                            0
+                                        ? () {
+                                            bool encontro = false;
+                                            for (int i = 0;
+                                                i <
+                                                        value
+                                                            .clienteColasActivas
+                                                            .length &&
+                                                    !encontro;
+                                                i++) {
+                                              if (value.clienteColasActivas
+                                                      .elementAt(i)
+                                                      .id_cola ==
+                                                  Provider.of<ColasActivasProvider>(
+                                                          context,
+                                                          listen: false)
+                                                      .colas[Provider.of<
+                                                                  ColasActivasProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .posColaActiva]
+                                                      .id) {
+                                                if (value.clienteColasActivas
+                                                        .elementAt(i)
+                                                        .id_estado ==
+                                                    1) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                          duration: Duration(
+                                                              seconds: 2),
+                                                          content: Text(
+                                                              '${value.clienteColasActivas[i].nombre} acaba de abandonar')));
+                                                  setState(() {
+                                                    value.clienteColasActivas
+                                                        .elementAt(i)
+                                                        .setIdEstado(3);
                                                     encontro = true;
                                                   });
                                                 }

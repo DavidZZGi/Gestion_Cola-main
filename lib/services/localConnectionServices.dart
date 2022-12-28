@@ -59,6 +59,10 @@ class ConnectionServices {
     _dbcargada = await openDatabase(dbPath);
   }
 
+  Future<void> updateBDCargada(path) async {
+    _dbcargada = await openDatabase(path);
+  }
+
 /*
 static Future<Database> getConennection()async{
 WidgetsFlutterBinding.ensureInitialized();

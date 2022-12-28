@@ -54,8 +54,41 @@ class _LineformState extends State<Lineform> {
   }
 
   final formKey = GlobalKey<FormBuilderState>();
+  bool validarCI(String? value) {
+    if ((int.parse(value!.substring(0, 1)) > 4 ||
+        int.parse(value.substring(0, 1)) == 0)) {
+      if (int.parse(value.substring(2, 3)) == 0 ||
+          int.parse(value.substring(2, 3)) == 1) {
+        if (int.parse(value.substring(2, 3)) == 1) {
+          if (int.parse(value.substring(3, 4)) == 1 ||
+              int.parse(value.substring(3, 4)) == 2) {
+            if ((int.parse(value.substring(4, 5)) == 0) ||
+                int.parse(value.substring(4, 5)) == 1 ||
+                int.parse(value.substring(4, 5)) == 2 ||
+                int.parse(value.substring(4, 5)) == 3) {
+              if (int.parse(value.substring(4, 5)) == 3) {
+                if (int.parse(value.substring(5, 6)) == 0 ||
+                    int.parse(value.substring(5, 6)) == 1) {
+                  return true;
+                }
+              } else
+                return true;
+            } else
+              return false;
+          } else
+            return false;
+        } else
+          return false;
+      } else
+        return false;
+    } else
+      return false;
+    return false;
+  }
+
   @override
   Widget build(BuildContext context) {
+    String ci;
     return Scaffold(
       appBar: AppBar(
         title: Text('Registrar Clientes'),
@@ -204,7 +237,7 @@ class _LineformState extends State<Lineform> {
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                             duration: Duration(seconds: 2),
                             content: Text(
-                                'Campos: nombres o apellidos, estan vacios')));
+                                'Campos: nombres o apellidos, estan vacios,o CI incorrecto')));
                       }
                     },
                     child: Text('Enviar')),
@@ -299,7 +332,7 @@ class _LineformState extends State<Lineform> {
             child: Text("Aceptar"),
             style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateColor.resolveWith((states) => Colors.blue)),
+                    MaterialStateColor.resolveWith((states) => Colors.green)),
             onPressed: () {
               ClienteColasActivas clienteRech = ClienteColasActivas(
                   ci: clientereal!.ci,
@@ -404,12 +437,13 @@ class _QRViewExampleState extends State<QRViewExample> {
           nombre: datos[0],
           id_municipio:
               Provider.of<MunicipioProvider>(context, listen: false).idActive);
-      if (!clientesVerify!.any((element) =>
-          int.parse(element.ci) == int.parse(cliente!.ci) &&
-          element.idCola == cliente.id_cola))
-        Provider.of<ClienteColaActivaProvider>(context, listen: false)
-            .addClienteColaActiva(cliente, idCola);
-      else {
+      if (!clientesVerify!
+          .any((element) => int.parse(element.ci) == int.parse(cliente!.ci))) {
+        Future.delayed(Duration.zero, () {
+          Provider.of<ClienteColaActivaProvider>(context, listen: false)
+              .addClienteColaActiva(cliente!, idCola);
+        });
+      } else {
         Future.delayed(Duration.zero, () {
           Navigator.push(
               context,

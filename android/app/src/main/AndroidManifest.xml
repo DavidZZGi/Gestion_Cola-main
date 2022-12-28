@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.line_management">
    <application
-        android:label="line_management"
+        android:label="Cola.cu"
         android:icon="@mipmap/cubacola">
         <activity
             android:name=".MainActivity"

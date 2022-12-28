@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:line_management/model/cliente-colas-activas.dart';
 import 'package:line_management/model/colas-activas.dart';
@@ -170,7 +171,7 @@ class _UpScreenPartState extends State<UpScreenPart> {
                   padding: const EdgeInsets.all(8.0),
                   child: Flexible(
                     child: Text(
-                      'Exportar Colas',
+                      'Exportar',
                       style: TextStyle(
                           color: Colors.white, fontWeight: FontWeight.bold),
                     ),
@@ -188,26 +189,61 @@ class _UpScreenPartState extends State<UpScreenPart> {
                               .productosCola
                               .length >
                           0) {
-                        insertarAllProductoServidor();
-                        insertarAllClientesServidor();
-                        insertarAllColasServidor();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            duration: Duration(seconds: 2),
-                            content: Text('Colas exportadas exitosamente')));
+                        showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  ListTile(
+                                    leading: Icon(Icons
+                                        .signal_cellular_connected_no_internet_4_bar_outlined),
+                                    title: Text(
+                                        'Exportar base de dato sin conexion'),
+                                    onTap: () async {
+                                      await Provider.of<
+                                                  ClienteColaActivaProvider>(
+                                              context,
+                                              listen: false)
+                                          .insertAllClienteColaActiva();
+                                      await Provider.of<ColasActivasProvider>(
+                                              context,
+                                              listen: false)
+                                          .insertAllColasActivas();
+                                      await Provider.of<ProductosColasProvider>(
+                                              context,
+                                              listen: false)
+                                          .insertAllproductosCola();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              duration: Duration(seconds: 2),
+                                              content: Text(
+                                                  'Colas exportadas localmente con exito')));
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: Icon(Icons.signal_wifi_4_bar),
+                                    title:
+                                        Text('Exportar base de dato a la nube'),
+                                    onTap: () {
+                                      insertarAllProductoServidor();
+                                      insertarAllClientesServidor();
+                                      insertarAllColasServidor();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              duration: Duration(seconds: 2),
+                                              content: Text(
+                                                  'Colas exportadas exitosamente')));
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            });
 
                         /*
-                      await Provider.of<ClienteColaActivaProvider>(context,
-                              listen: false)
-                          .insertAllClienteColaActiva();
-                      await Provider.of<ColasActivasProvider>(context,
-                              listen: false)
-                          .insertAllColasActivas();
-                      await Provider.of<ProductosColasProvider>(context,
-                              listen: false)
-                          .insertAllproductosCola();
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          duration: Duration(seconds: 2),
-                          content: Text('Colas exportadas exitosamente')));
+                     
                           */
                       }
                     },
@@ -309,19 +345,67 @@ class _UpScreenPartState extends State<UpScreenPart> {
                             color: Colors.white,
                           ),
                           onPressed: () {
-                            Provider.of<ColasActivasProvider>(context,
-                                    listen: false)
-                                .importarColasActivas();
-                            Provider.of<ClienteColaActivaProvider>(context,
-                                    listen: false)
-                                .importarClientes();
-                            Provider.of<ProductosColasProvider>(context,
-                                    listen: false)
-                                .importarProductosColas();
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                duration: Duration(seconds: 2),
-                                content:
-                                    Text('Colas importadas exitosamente')));
+                            showModalBottomSheet(
+                                context: context,
+                                builder: (context) {
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      ListTile(
+                                        leading: Icon(Icons
+                                            .signal_cellular_connected_no_internet_4_bar_outlined),
+                                        title: Text(
+                                            'Importar base de dato sin conexion'),
+                                        onTap: () async {
+                                          FilePickerResult? result =
+                                              await FilePicker.platform
+                                                  .pickFiles();
+                                          if (result !=
+                                              null) if (result.count == 1)
+                                            Provider.of<ConnectionProvider>(
+                                                    context,
+                                                    listen: false)
+                                                .updateBD(result.paths[0]);
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading: Icon(Icons.signal_wifi_4_bar),
+                                        title: Text(
+                                            'Importar base de dato de la nube'),
+                                        onTap: () {
+                                          Provider.of<ColasActivasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .importarColasActivas();
+                                          Provider.of<ClienteColaActivaProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .importarClientes();
+                                          Provider.of<ProductosColasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .importarProductosColas();
+                                          Provider.of<ColasActivasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .setPosColaActiva(Provider.of<
+                                                          ColasActivasProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .colas
+                                                  .length);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  duration:
+                                                      Duration(seconds: 2),
+                                                  content: Text(
+                                                      'Colas importadas exitosamente')));
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                });
                           },
                           style: ElevatedButton.styleFrom(
                             fixedSize: const Size(60, 60),

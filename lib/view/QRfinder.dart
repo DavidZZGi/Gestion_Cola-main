@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../model/ClienteValidator.dart';
+import '../model/cliente-colas-activas.dart';
 import '../model/estados.dart';
+import '../provider/clientesColasActivasProvider.dart';
 
 class QRFind extends StatelessWidget {
   final cliente;
@@ -38,7 +41,9 @@ class QRFind extends StatelessWidget {
         '/' +
         fecha.substring(4, 6);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Cliente encontrado en l sistema'),
+      ),
       body: Container(
         padding: EdgeInsets.all(12.0),
         decoration: BoxDecoration(
@@ -60,7 +65,40 @@ class QRFind extends StatelessWidget {
               Text('Productos: $productos'),
               Text('Tienda: $nombTiemda'),
               Text('Fecha: $fechareal'),
-              Text('Estado: ${Estados.getEstadoName(cliente.id_estado)}')
+              Text('Estado: ${Estados.getEstadoName(cliente.id_estado)}'),
+              Row(
+                children: [
+                  ElevatedButton(
+                      child: Text("Aceptar"),
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateColor.resolveWith(
+                              (states) => Colors.green)),
+                      onPressed: () {
+                        ClienteColasActivas clienteRech = ClienteColasActivas(
+                            ci: clientereal!.ci,
+                            nombre: cliente.nombre,
+                            id_cola: cliente.id_cola,
+                            fv: '',
+                            id_estado: 2,
+                            id_municipio: cliente.id_municipio,
+                            fecha_modif: DateTime.now().toIso8601String(),
+                            fecha_registro: cliente.fecha_registro);
+                        Provider.of<ClienteColaActivaProvider>(context,
+                                listen: false)
+                            .addClienteColaActiva(
+                                clienteRech, clienteRech.id_cola);
+                        Navigator.of(context).pop();
+                      }),
+                  ElevatedButton(
+                      child: Text("Rechazar"),
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateColor.resolveWith(
+                              (states) => Colors.red)),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      }),
+                ],
+              )
             ],
           ),
         ),

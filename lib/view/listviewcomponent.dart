@@ -103,6 +103,7 @@ class _MylistViewState extends State<MylistView> {
                                     (states) =>
                                         Color.fromARGB(255, 67, 65, 65))),
                             onPressed: (() {
+                              /*
                               setState(() {
                                 int idnewEstado = 1;
                                 if (clientes[i].id_estado == 4) {
@@ -130,15 +131,10 @@ class _MylistViewState extends State<MylistView> {
                                         listen: false)
                                     .clienteColasActivas[pos]
                                     .id_estado);
-                              });
+                              });*/
                             }),
                             child: Column(
                               children: [
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                                  child: Text('Estado'),
-                                ),
                                 Padding(
                                   padding: const EdgeInsets.only(bottom: 5),
                                   child: Flexible(

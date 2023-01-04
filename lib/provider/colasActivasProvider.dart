@@ -30,6 +30,11 @@ class ColasActivasProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> importarColasActivasLocal() async {
+    colas = await ConnectionProvider.connection.getAllColasActivas();
+    notifyListeners();
+  }
+
   void addCola(ColaActiva cola) {
     colas.add(cola);
     notifyListeners();

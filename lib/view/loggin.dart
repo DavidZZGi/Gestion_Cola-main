@@ -77,7 +77,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 FormBuilderValidators.numeric(),
                 FormBuilderValidators.minLength(8,
                     errorText:
-                        'El numero de telefono tiene que tener 8 cifras'),
+                        'El número de teléfono tiene que tener 8 cifras'),
               ]),
             ),
           ),
@@ -91,6 +91,9 @@ class _SignUpFormState extends State<SignUpForm> {
               validator: FormBuilderValidators.compose([
                 FormBuilderValidators.numeric(),
                 FormBuilderValidators.minLength(11,
+                    errorText:
+                        'El Carnet de Identidad tiene que tener 11 cifras'),
+                FormBuilderValidators.maxLength(11,
                     errorText:
                         'El Carnet de Identidad tiene que tener 11 cifras'),
               ]),

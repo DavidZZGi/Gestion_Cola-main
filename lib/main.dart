@@ -15,7 +15,6 @@ import 'package:line_management/view/createLineView.dart';
 import 'package:line_management/view/lineform.dart';
 import 'package:line_management/view/loading.dart';
 import 'package:line_management/view/loggin.dart';
-import 'package:line_management/view/shopSelector.dart';
 import 'package:line_management/view/subCola.dart';
 import 'package:line_management/view/tapbar.dart';
 import 'package:line_management/view/upscreen_part.dart';
@@ -52,7 +51,6 @@ void main() {
         '/': (context) => const SignUpScreen(),
         '/cubacola': (context) => MyApp(),
         '/lineform': (context) => Lineform(),
-        '/shopselector': (context) => ShopSelector(),
         '/subcola': ((context) => SubCola()),
         '/createline': ((context) => CreateLineWidget()),
         '/productsearch': ((context) => ProductSearchBar()),

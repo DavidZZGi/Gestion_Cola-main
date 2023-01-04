@@ -33,14 +33,14 @@ dependencies:
 
   flutter_spinkit: ^5.1.0
  
-  anim_search_bar: ^2.0.2
+
   sqflite: ^2.0.2
   http: ^0.13.4
   qr_code_scanner: ^1.0.0
   path_provider: ^2.0.11
   form_builder_validators: ^8.3.0
   flutter_form_builder: ^7.7.0
-  flappy_search_bar_ns: ^2.0.2
+  
   intl: ^0.17.0
   file_picker: ^5.2.4
   

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:line_management/provider/connectionProvider.dart';
 import 'package:provider/provider.dart';
 import '../model/ClienteValidator.dart';
 import '../model/cliente-colas-activas.dart';
@@ -19,19 +20,18 @@ class QRFind extends StatelessWidget {
     String productos = '';
     ClienteValidator? clientereal;
     for (int i = 0; i < clientesVerify!.length; i++) {
-      if (cliente.ci == clientesVerify!.elementAt(i).ci &&
-          cliente.id_cola == clientesVerify!.elementAt(i).id_cola) {
+      if (int.parse(cliente.ci) == int.parse(clientesVerify!.elementAt(i).ci)) {
         // clientereal = clientesVerify!.elementAt(i);
         clientereal = ClienteValidator(
             ci: clientesVerify!.elementAt(i).ci,
-            idCola: clientesVerify!.elementAt(i).id_cola,
+            idCola: clientesVerify!.elementAt(i).idCola,
             nombProducto: clientesVerify!.elementAt(i).nombProducto,
             idEstado: clientesVerify!.elementAt(i).idEstado);
         productos += '' + clientesVerify!.elementAt(i).nombProducto + '/';
       }
     }
     print(productos);
-    int idTienda = int.parse(cliente!.id_cola.toString().substring(0, 3));
+    int idTienda = int.parse(clientereal!.idCola.toString().substring(0, 3));
     print(idTienda);
 
     String fecha = '2' + cliente.id_cola.toString().substring(3, 8);
@@ -63,19 +63,21 @@ class QRFind extends StatelessWidget {
               ),
               Text('CI: ${cliente.ci}'),
               Text('Productos: $productos'),
-              Text('Tienda: $nombTiemda'),
+              Text(
+                  'Tienda: ${Provider.of<ConnectionProvider>(context, listen: false).nomShopId(idTienda)}'),
               Text('Fecha: $fechareal'),
               Text('Estado: ${Estados.getEstadoName(cliente.id_estado)}'),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
                       child: Text("Aceptar"),
                       style: ButtonStyle(
                           backgroundColor: MaterialStateColor.resolveWith(
-                              (states) => Colors.green)),
+                              (states) => Colors.blue)),
                       onPressed: () {
                         ClienteColasActivas clienteRech = ClienteColasActivas(
-                            ci: clientereal!.ci,
+                            ci: cliente!.ci,
                             nombre: cliente.nombre,
                             id_cola: cliente.id_cola,
                             fv: '',

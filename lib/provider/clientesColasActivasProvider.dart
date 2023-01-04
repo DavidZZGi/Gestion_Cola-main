@@ -17,6 +17,14 @@ class ClienteColaActivaProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> insertAllClienteColaActivaHistorico() async {
+    if (ConnectionProvider.isConnected) {
+      await ConnectionProvider.connection
+          .insertClientHistoricosAll(clienteColasActivas);
+    }
+    notifyListeners();
+  }
+
   List<ClienteColasActivas> develverClientesDadoIdCola(int? idCola) {
     List<ClienteColasActivas> list = [];
     for (int i = 0; i < clienteColasActivas.length; i++) {

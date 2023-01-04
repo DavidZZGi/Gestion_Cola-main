@@ -206,6 +206,11 @@ class _UpScreenPartState extends State<UpScreenPart> {
                                               context,
                                               listen: false)
                                           .insertAllClienteColaActiva();
+                                      await Provider.of<
+                                                  ClienteColaActivaProvider>(
+                                              context,
+                                              listen: false)
+                                          .insertAllClienteColaActivaHistorico();
                                       await Provider.of<ColasActivasProvider>(
                                               context,
                                               listen: false)
@@ -214,6 +219,10 @@ class _UpScreenPartState extends State<UpScreenPart> {
                                               context,
                                               listen: false)
                                           .insertAllproductosCola();
+                                      await Provider.of<ProductosColasProvider>(
+                                              context,
+                                              listen: false)
+                                          .insertAllproductosColaDelDia();
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(SnackBar(
                                               duration: Duration(seconds: 2),
@@ -286,16 +295,29 @@ class _UpScreenPartState extends State<UpScreenPart> {
                             onPressed: value.colaCreada
                                 ? () {
                                     setState(() {
-                                      if (Provider.of<ClienteColaActivaProvider>(
+                                      if ((!Provider.of<
+                                                  ClienteColaActivaProvider>(
+                                              context,
+                                              listen: false)
+                                          .clienteColasActivas
+                                          .any((element) =>
+                                              element.id_estado == 4))) {
+                                        _showDialogSubColaSinCliente();
+                                      } else if (Provider.of<
+                                                      ClienteColaActivaProvider>(
                                                   context,
                                                   listen: false)
                                               .clienteColasActivas
-                                              .length >
-                                          0) {
+                                              .any((element) =>
+                                                  element.id_estado == 4) &&
+                                          Provider.of<ClienteColaActivaProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .clienteColasActivas
+                                              .any((element) =>
+                                                  element.id_estado == 1)) {
                                         _showDialog(
                                             _buildAlertDialogCrearSubola());
-                                      } else {
-                                        _showDialogSubColaSinCliente();
                                       }
                                     });
                                   }
@@ -355,7 +377,7 @@ class _UpScreenPartState extends State<UpScreenPart> {
                                         leading: Icon(Icons
                                             .signal_cellular_connected_no_internet_4_bar_outlined),
                                         title: Text(
-                                            'Importar base de dato sin conexion'),
+                                            'Importar base de dato sin conexion de almacenamiento'),
                                         onTap: () async {
                                           FilePickerResult? result =
                                               await FilePicker.platform
@@ -366,6 +388,32 @@ class _UpScreenPartState extends State<UpScreenPart> {
                                                     context,
                                                     listen: false)
                                                 .updateBD(result.paths[0]);
+                                        },
+                                      ),
+                                      ListTile(
+                                        leading: Icon(Icons
+                                            .signal_cellular_connected_no_internet_0_bar),
+                                        title: Text(
+                                            'Importar base de dato sin conexion de dia anterior'),
+                                        onTap: () async {
+                                          Provider.of<ColasActivasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .importarColasActivasLocal();
+                                          Provider.of<ColasActivasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .setPosColaActiva(Provider.of<
+                                                          ColasActivasProvider>(
+                                                      context,
+                                                      listen: false)
+                                                  .colas
+                                                  .length);
+                                          Provider.of<ProductosColasProvider>(
+                                                  context,
+                                                  listen: false)
+                                              .importarProductosColasLocal();
+                                          Navigator.pop(context);
                                         },
                                       ),
                                       ListTile(
@@ -425,32 +473,29 @@ class _UpScreenPartState extends State<UpScreenPart> {
   }
 
   Widget _buildAlertDialog() {
-    if (listaClienteSucola!.length > 0) {
-      return AlertDialog(
-        title: Text('Iniciar Subcola'),
-        content: Text(
-            "¿Desea iniciar la subcola a partir de este cliente:${listaClienteSucola![0].nombre} )"),
-        actions: <Widget>[
-          ElevatedButton(
-              child: Text("Aceptar"),
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateColor.resolveWith((states) => Colors.blue)),
-              onPressed: () {
-                _showDialogSubColaProducto();
-              }),
-          ElevatedButton(
-              child: Text("Cancelar"),
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateColor.resolveWith((states) => Colors.red)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              }),
-        ],
-      );
-    } else
-      return AlertSubcolaSinCliente(context: context);
+    return AlertDialog(
+      title: Text('Iniciar Subcola'),
+      content: Text(
+          "¿Desea iniciar la subcola a partir de este cliente:${listaClienteSucola![0].nombre} )"),
+      actions: <Widget>[
+        ElevatedButton(
+            child: Text("Aceptar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.blue)),
+            onPressed: () {
+              _showDialogSubColaProducto();
+            }),
+        ElevatedButton(
+            child: Text("Cancelar"),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateColor.resolveWith((states) => Colors.red)),
+            onPressed: () {
+              Navigator.of(context).pop();
+            }),
+      ],
+    );
   }
 
   void _showDialog(Widget widget) {

@@ -6,7 +6,7 @@ import 'package:line_management/model/colas-activas.dart';
 import '../model/line.dart';
 
 class ColaActivaService {
-  static const String url = 'http://10.0.2.2:3006/cola';
+  static const String url = 'http://192.168.43.29:3006/cola';
   Future<http.Response> createLine(ColaActiva cola) async {
     return http.post(
       Uri.parse('$url/create'),

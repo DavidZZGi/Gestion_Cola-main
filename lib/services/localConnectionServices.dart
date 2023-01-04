@@ -98,7 +98,7 @@ return database;
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "clientes_colas_activas" ("ci"	NVARCHAR(11) NOT NULL,"fv"	NVARCHAR(9),"nombre"	NVARCHAR(50) ,"id_municipio"	INTEGER NOT NULL DEFAULT 0,"fecha_registro"	DATETIME NOT NULL,"fecha_modif"	DATETIME,"id_estado"	INTEGER NOT NULL DEFAULT 1,"id_cola"	INTEGER NOT NULL,PRIMARY KEY("ci","id_cola"));');
     await db.execute(
-        'CREATE TABLE IF NOT EXISTS "productos_colas" ("id_cola" INTEGER NOT NULL,"id_producto" INTEGER NOT NULL,PRIMARY KEY("id_cola","id_producto"));');
+        'CREATE TABLE IF NOT EXISTS "productos_colas" ("id_cola" INTEGER NOT NULL,"id_producto" INTEGER NOT NULL);');
     await db.execute(
         'CREATE TABLE IF NOT EXISTS "colas_activas" ("id"	INTEGER NOT NULL UNIQUE,"tienda" INTEGER NOT NULL,"fecha"	DATETIME NOT NULL,PRIMARY KEY("id"));');
     await db.execute(
@@ -136,22 +136,27 @@ return database;
       return [];
   }
 
-/*
   Future<List<ClienteColasActivas>> getAllClientesColasActivas() async {
     if (_db != null) {
       final List<Map<String, dynamic>> colasActivas =
-          await _db!.query('clientes-colas-activas', distinct: true);
+          await _db!.query('clientes_colas_activas', distinct: true);
       return List.generate(colasActivas.length, (i) {
         print(colasActivas[i]);
         return ClienteColasActivas(
-            id: colasActivas[i]['id'],
-            fecha: colasActivas[i]['fecha'],
-            idTienda: colasActivas[i]['idTienda']);
+          ci: colasActivas[i]['ci'],
+          fecha_registro: colasActivas[i]['fecha_registro'],
+          id_estado: colasActivas[i]['id_estado'],
+          fecha_modif: colasActivas[i]['fecha_modif'],
+          id_cola: colasActivas[i]['id_cola'],
+          id_municipio: colasActivas[i]['id_municipio'],
+          fv: colasActivas[i]['fv'],
+          nombre: colasActivas[i]['nombre'],
+        );
       });
     } else
       return [];
   }
-*/
+
   //Crud Colas-Activas
   Future<void> insertColaActiva(ColaActiva cola) async {
     if (_db != null) {
@@ -174,7 +179,7 @@ return database;
         return ColaActiva(
             id: colasActivas[i]['id'],
             fecha: colasActivas[i]['fecha'],
-            tienda: colasActivas[i]['idTienda']);
+            tienda: colasActivas[i]['tienda']);
       });
     } else
       return [];
@@ -194,6 +199,20 @@ return database;
     }
   }
 
+  //Insert Producto Cola en dbcargada
+  Future<void> insertProductosColaDBCargada(ProductosColas producto) async {
+    if (_dbcargada != null) {
+      await _db!.insert('productos_colas', producto.toMap());
+    }
+  }
+
+  Future<void> insertAllProductosColaDBCargada(
+      List<ProductosColas> productosColas) async {
+    for (var element in productosColas) {
+      insertProductosCola(element);
+    }
+  }
+
   Future<List<ProductosColas>> getAllProductosColas() async {
     if (_dbcargada != null) {
       final List<Map<String, dynamic>> productosCola =
@@ -201,8 +220,8 @@ return database;
       return List.generate(productosCola.length, (i) {
         print(productosCola[i]);
         return ProductosColas(
-          id_cola: productosCola[i]['idCola'],
-          id_producto: productosCola[i]['idProducto'],
+          id_cola: productosCola[i]['id_cola'],
+          id_producto: productosCola[i]['id_producto'],
         );
       });
     } else
@@ -252,6 +271,22 @@ return database;
             'INSERT INTO cliente(ci,nombre,apellidos) VALUES(?,?,?)',
             [cliente.carnetIdentidad, cliente.nombre, cliente.apellidos]);
       });
+    }
+  }
+
+//Insertar en bd cargada clientes de ayer
+  Future<void> insertClientHistoricos(ClienteColasActivas cliente) async {
+    if (_dbcargada != null) {
+      await _dbcargada!.rawInsert(
+          'INSERT INTO clientes_colas_historicas(ci,id_estado,id_cola,id_mensaje) VALUES(?,?,?,?)',
+          [cliente.ci, cliente.id_estado, cliente.id_cola, 0]);
+    }
+  }
+
+  Future<void> insertClientHistoricosAll(
+      List<ClienteColasActivas> clientes) async {
+    for (var element in clientes) {
+      insertClientHistoricos(element);
     }
   }
 
@@ -367,6 +402,22 @@ return database;
           productName: productos[i]['nombre'],
           id: productos[i]['id'],
           idTipo: productos[i]['id_tipo']);
+    });
+  }
+
+  //OBTENER PRODUCTO DADO EL ID COLA
+  Future<List<ProductosColas>> getProductoDadoIdCola(int id) async {
+    final db = _db!;
+    final List<Map<String, dynamic>> productos = await db.query(
+        'productos_colas',
+        where: 'id_cola=?',
+        whereArgs: [id],
+        distinct: true);
+    return List.generate(productos.length, (i) {
+      return ProductosColas(
+        id_cola: productos[i]['id_cola'],
+        id_producto: productos[i]['id_producto'],
+      );
     });
   }
 

@@ -16,6 +16,14 @@ class ProductosColasProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> insertAllproductosColaDelDia() async {
+    if (ConnectionProvider.isConnected) {
+      await ConnectionProvider.connection
+          .insertAllProductosColaDBCargada(productosCola);
+    }
+    notifyListeners();
+  }
+
   List<ProductosColas> develverProductosDadoIdCola(int idCola) {
     List<ProductosColas> productosDeUnaCola = [];
     for (var element in productosCola) {
@@ -62,6 +70,11 @@ class ProductosColasProvider with ChangeNotifier {
 
   Future<void> importarProductosColas() async {
     productosCola = await productService.fetchAllProduct();
+    notifyListeners();
+  }
+
+  Future<void> importarProductosColasLocal() async {
+    productosCola = await ConnectionProvider.connection.getAllProductosColas();
     notifyListeners();
   }
 }

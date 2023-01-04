@@ -7,7 +7,7 @@ import 'package:line_management/model/Product.dart';
 import 'package:line_management/model/productos-colas.dart';
 
 class ProductoService {
-  static const url = 'http://10.0.2.2:3002/productos';
+  static const url = 'http://192.168.43.29:3002/productos';
 
   Future<List<ProductosColas>> fetchAllProduct() async {
     List<ProductosColas> products = [];

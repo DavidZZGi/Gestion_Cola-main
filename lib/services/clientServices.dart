@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:line_management/model/cliente-colas-activas.dart';
 
 class ClienteService {
-  static const url = 'http://10.0.2.2:3000/cliente';
+  static const url = 'http://192.168.43.29:3000/cliente';
   Future<List<ClienteColasActivas>> fetchAllClients() async {
     List<ClienteColasActivas> result = [];
     http.Response response = await http.get(Uri.parse('$url'));

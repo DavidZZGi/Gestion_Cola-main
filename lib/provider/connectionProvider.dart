@@ -3,6 +3,7 @@ import 'package:line_management/model/Product.dart';
 import 'package:line_management/model/municipio.dart';
 import 'package:line_management/model/shop.dart';
 import 'package:line_management/services/localConnectionServices.dart';
+import 'package:line_management/services/shopServices.dart';
 
 import '../model/client.dart';
 
@@ -15,6 +16,7 @@ class ConnectionProvider with ChangeNotifier {
   List<Shop> shops = [];
   List<Shop> shopMun = [];
   static bool isConnected = false;
+  ShopService shopService = ShopService();
 
   Future<void> getConnection() async {
     await connection.cargarBD();
@@ -124,5 +126,12 @@ class ConnectionProvider with ChangeNotifier {
 
   Future<void> updateBD(path) async {
     await connection.updateBDCargada(path);
+  }
+
+  Future<void> initTiendasenServer() async {
+    shops = await connection.getAllShops();
+    for (var element in shops) {
+      await shopService.createShop(element);
+    }
   }
 }

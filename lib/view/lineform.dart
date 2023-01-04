@@ -48,6 +48,8 @@ class _LineformState extends State<Lineform> {
     super.initState();
     Provider.of<GestionadorProvider>(context, listen: false)
         .cargarAllValidatorData();
+    Provider.of<GestionadorProvider>(context, listen: false)
+        .cargarValidatorDataHistorico();
     clientesVerify = Provider.of<GestionadorProvider>(context, listen: false)
         .clienteValidator;
     Provider.of<ConnectionProvider>(context, listen: false).getAllShops();
@@ -332,7 +334,7 @@ class _LineformState extends State<Lineform> {
             child: Text("Aceptar"),
             style: ButtonStyle(
                 backgroundColor:
-                    MaterialStateColor.resolveWith((states) => Colors.green)),
+                    MaterialStateColor.resolveWith((states) => Colors.blue)),
             onPressed: () {
               ClienteColasActivas clienteRech = ClienteColasActivas(
                   ci: clientereal!.ci,
